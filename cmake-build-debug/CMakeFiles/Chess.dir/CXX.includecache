@@ -6,7 +6,9 @@
 
 #IncludeRegexTransform: 
 
-C:/Users/jakub/Desktop/Chess/main.cpp
+D:/GitRepositories/AI_chess/main.cpp
 iostream
+-
+vector
 -
 
