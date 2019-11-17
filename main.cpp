@@ -1,4 +1,6 @@
-#include <iostream>
+#include "mainwindow.h"
+
+#include <QApplication>
 #include <vector>
 
 using namespace std;
@@ -970,12 +972,17 @@ class chess_board{
     }
 };
 
-int main() {
-    //QT
-
+int main(int argc, char *argv[])
+{
+    /*
     chess_board board;
     board.draw_board();
     board.draw_pawns();
     board.deleteBoard();
-    return 0;
+    */
+
+    QApplication a(argc, argv);
+    MainWindow w;
+    w.show();
+    return a.exec();
 }
