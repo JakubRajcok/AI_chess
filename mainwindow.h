@@ -17,5 +17,9 @@ public:
 
 private:
     Ui::MainWindow *ui;
+signals:
+    void pohniStrelcom(int, int);
+private slots:
+    void on_pushButton_clicked();
 };
 #endif // MAINWINDOW_H

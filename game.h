@@ -12,6 +12,8 @@ public:
 signals:
 
 public slots:
+
+    void vyriesPohybStrelca(int,int);
 };
 
 #endif // GAME_H
