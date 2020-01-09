@@ -1,15 +1,14 @@
 #ifndef KING_H
 #define KING_H
 
-#include "boardposition.h"
+#include "chesspiece.h"
 
-class King{
-    int color;//0-black, 1-white
-    bool check;//if checked
-    BoardPosition position;//where is he?
+class King:public ChessPiece
+{
 public:
     King();
-    King(int color,BoardPosition position);
+
+    void findValidMoves(BoardPosition &pos);
 };
 
 #endif // KING_H

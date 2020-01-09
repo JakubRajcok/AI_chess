@@ -7,6 +7,19 @@
 
 class ChessPiece:public QGraphicsPixmapItem
 {
+
+protected:
+
+    /*
+
+    */
+    int type; // number from 0 to 11 representing exact type of chesspiece
+    BoardPosition *position;
+    int color; //0-black, 1-white
+    bool isPlaced;
+    QList <BoardPosition> validMoves;
+    ChessBoard *board;
+
 public:
 
     ChessPiece();
@@ -28,17 +41,6 @@ public:
     int whosOnBox(BoardPosition &pos);
     ~ChessPiece();
 
-protected:
-
-    /*
-
-    */
-    int type; // number from 0 to 11 representing exact type of chesspiece
-    BoardPosition *position;
-    int color; //0-black, 1-white
-    bool isPlaced;
-    QList <BoardPosition> validMoves;
-    ChessBoard *board;
 
 };
 

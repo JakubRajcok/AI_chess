@@ -1,17 +1,19 @@
 #ifndef CHESSBOARD_H
 #define CHESSBOARD_H
 
-#include "king.h"
 #include "boardposition.h"
 #include <vector>
+#include "chesspiece.h"
 
 class ChessBoard{
 private:
      int ***board;
-     King kingBlack;
-     King kingWhite;
      int actualChessPiece;
      std::vector<BoardPosition> validMoves;
+     std::vector<ChessPiece> ChessPieceAliveWhite;
+     std::vector<ChessPiece> ChessPieceAliveBlack;
+     std::vector<ChessPiece> ChessPieceDeadWhite{};
+     std::vector<ChessPiece> ChessPieceDeadBlack{};
 public:
     ChessBoard();
     void draw_board();

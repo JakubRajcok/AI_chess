@@ -27,50 +27,68 @@ ChessBoard::ChessBoard(){
                     case 0://BLACK Rook
                         this->board[i][j][3]=1;
                         this->board[i][7][3]=1;
+                        this->ChessPieceAliveBlack.push_back(new Rook(new BoardPosition(i,j),this));
+                        this->ChessPieceAliveBlack.push_back(new Rook(new BoardPosition(i,7),this));
                         break;
                     case 1://BLACK Horseman
                         this->board[i][j][1]=1;
                         this->board[i][6][1]=1;
+                        this->ChessPieceAliveBlack.push_back(new Horse(new BoardPosition(i,j),this));
+                        this->ChessPieceAliveBlack.push_back(new Horse(new BoardPosition(i,6),this));
                         break;
                     case 2://BLACK Bishop
                         this->board[i][j][2]=1;
                         this->board[i][5][2]=1;
+                        this->ChessPieceAliveBlack.push_back(new Bishop(new BoardPosition(i,j),this));
+                        this->ChessPieceAliveBlack.push_back(new Bishop(new BoardPosition(i,5),this));
                         break;
                     case 3://BLACK Queen
                         this->board[i][j][4]=1;
+                        this->ChessPieceAliveBlack.push_back(new Queen(new BoardPosition(i,j),this));
                         break;
                     case 4://BLACK King
                         this->board[i][j][5]=1;
-                        this->kingBlack=King(0,BoardPosition(i,j));// emmmmmmmmmmmmmmmmmmmmmmmmmm mozno new?
+                        this->ChessPieceAliveBlack.push_back(new King(new BoardPosition(i,j),this));
                         break;
                 }
             }
             else
-                if(i==1)//BLACK Pawns
+                if(i==1){//BLACK Pawns
                     this->board[i][j][0]=1;
-                else if(i==6)//White Pawns
-                    this->board[i][j][6]=1;
+                    this->ChessPieceAliveBlack.push_back(new Pawn(new BoardPosition(i,j),this));
+                }
+                else if(i==6){//White Pawns
+                        this->board[i][j][6]=1;
+                        ChessPieceAliveWhite.push_back(new Pawn(new BoardPosition(i,j),this));
+                        }
                 //Rad nepesiakov WHITE
                 else if(i==7){
                     switch (j){
                         case 0://WHITE Rook
                             this->board[i][j][3+6]=1;
                             this->board[i][7][3+6]=1;
+                            ChessPieceAliveWhite.push_back(new Rook(new BoardPosition(i,j),this));
+                            ChessPieceAliveWhite.push_back(new Rook(new BoardPosition(i,7),this));
                             break;
                         case 1://WHITE Horseman
                             this->board[i][j][1+6]=1;
                             this->board[i][6][1+6]=1;
+                            ChessPieceAliveWhite.push_back(new Horse(new BoardPosition(i,j),this));
+                            ChessPieceAliveWhite.push_back(new Horse(new BoardPosition(i,6),this));
                             break;
                         case 2://WHITE Bishop
                             this->board[i][j][2+6]=1;
                             this->board[i][5][2+6]=1;
+                            ChessPieceAliveWhite.push_back(new Bishop(new BoardPosition(i,j),this));
+                            ChessPieceAliveWhite.push_back(new Bishop(new BoardPosition(i,5),this));
                             break;
                         case 3://WHITE Queen
                             this->board[i][j][4+6]=1;
+                            ChessPieceAliveWhite.push_back(new Queen(new BoardPosition(i,j),this));
                             break;
                         case 4://WHITE King
                             this->board[i][j][5+6]=1;
-                            this->kingWhite=King(0,BoardPosition(i,j));
+                            ChessPieceAliveWhite.push_back(new King(new BoardPosition(i,j),this));
                             break;
                     }
                 }else
@@ -175,6 +193,7 @@ int ChessBoard::whosOnBox(int posX, int posY){//Ked Kliknes odpoveda ti board
  *  *Kingovia neriesia ziadne sachy paty ani maty... dorob
  *  */
 
+/*
 std::vector<BoardPosition>* ChessBoard::findValidMoves(int posX,int posY){
     //return array which contains pairs of positions and len of array
 
@@ -206,129 +225,12 @@ std::vector<BoardPosition>* ChessBoard::findValidMoves(int posX,int posY){
         case 10://Queen white
 
         case (5)://king black
-            validMovesBlackKing(posX,posY, out);
-            return out;
+
         case 11://King white
-            validMovesWhiteKing(posX,posY, out);
-            return out;
+
         default:
             //cerr<<"findValidErr";//_____________________________________________________________________________________definuj NEDEFINOVANE
             break;
     }
 }
-
-void ChessBoard::validMovesBlackKing(int posX, int posY, std::vector<BoardPosition> *out){
-    int tmpX=posX;
-    int tmpY=posY;
-    int i=1;
-
-    //No mily moj, tu potrebujes sledovat, ci ta niekto po tvojom super pohybe nebude sachovat, enjoy :)
-
-    if(posX>0 && posY>0){
-        if(whosOnBox(posX-1,posY-1)==-1)
-            out->push_back(BoardPosition(posX-1,posY-1));
-        if(whosOnBox(posX-1,posY-1) > 5)
-            out->push_back(BoardPosition(posX-1,posY-1));
-    }
-    if(posY>0){
-        if(whosOnBox(posX,posY-1)==-1)
-            out->push_back(BoardPosition(posX,posY-1));
-        if(whosOnBox(posX,posY-1)>5)
-            out->push_back(BoardPosition(posX,posY-1));
-    }
-    if(posX<7 && posY>0){
-        if(whosOnBox(posX+1,posY-1)==-1)
-            out->push_back(BoardPosition(posX+1,posY-1));
-        if(whosOnBox(posX+1,posY-1)>5)
-            out->push_back(BoardPosition(posX+1,posY-1));
-    }
-    if(posX<7){
-        if(whosOnBox(posX+1,posY)==-1)
-            out->push_back(BoardPosition(posX+1,posY));
-        if(whosOnBox(posX+1,posY)>5)
-            out->push_back(BoardPosition(posX+1,posY));
-    }
-    if(posX<7 && posY<7){
-        if(whosOnBox(posX+1,posY+1)==-1)
-            out->push_back(BoardPosition(posX+1,posY+1));
-        if(whosOnBox(posX+1,posY+1)>5)
-            out->push_back(BoardPosition(posX+1,posY+1));
-    }
-    if(posY<7){
-        if(whosOnBox(posX,posY+1)==-1)
-            out->push_back(BoardPosition(posX,posY+1));
-        if(whosOnBox(posX,posY+1)>5)
-            out->push_back(BoardPosition(posX,posY+1));
-    }
-    if(posX>0 && posY<7){
-        if(whosOnBox(posX-1,posY+1)==-1)
-            out->push_back(BoardPosition(posX-1,posY+1));
-        if(whosOnBox(posX-1,posY+1)>5)
-            out->push_back(BoardPosition(posX-1,posY+1));
-    }
-    if(posX>0){
-        if(whosOnBox(posX-1,posY)==-1)
-            out->push_back(BoardPosition(posX-1,posY));
-        if(whosOnBox(posX-1,posY)>5)
-            out->push_back(BoardPosition(posX-1,posY));
-    }
-}
-
-void ChessBoard::validMovesWhiteKing(int posX, int posY, std::vector<BoardPosition> *out){
-    int tmpX=posX;
-    int tmpY=posY;
-    int i=1;
-
-    //____________________No mily moj, tu potrebujes sledovat, ci ta niekto po tvojom super pohybe nebude sachovat, enjoy :)
-
-    if(posX>0 && posY>0){
-        if(whosOnBox(posX-1,posY-1)==-1)
-            out->push_back(BoardPosition(posX-1,posY-1));
-        if(whosOnBox(posX-1,posY-1) < 6)
-            out->push_back(BoardPosition(posX-1,posY-1));
-    }
-    if(posY>0){
-        if(whosOnBox(posX,posY-1)==-1)
-            out->push_back(BoardPosition(posX,posY-1));
-        if(whosOnBox(posX,posY-1)< 6)
-            out->push_back(BoardPosition(posX,posY-1));
-    }
-    if(posX<7 && posY>0){
-        if(whosOnBox(posX+1,posY-1)==-1)
-            out->push_back(BoardPosition(posX+1,posY-1));
-        if(whosOnBox(posX+1,posY-1)< 6)
-            out->push_back(BoardPosition(posX+1,posY-1));
-    }
-    if(posX<7){
-        if(whosOnBox(posX+1,posY)==-1)
-            out->push_back(BoardPosition(posX+1,posY));
-        if(whosOnBox(posX+1,posY)< 6)
-            out->push_back(BoardPosition(posX+1,posY));
-    }
-    if(posX<7 && posY<7){
-        if(whosOnBox(posX+1,posY+1)==-1)
-            out->push_back(BoardPosition(posX+1,posY+1));
-        if(whosOnBox(posX+1,posY+1)< 6)
-            out->push_back(BoardPosition(posX+1,posY+1));
-    }
-    if(posY<7){
-        if(whosOnBox(posX,posY+1)==-1)
-            out->push_back(BoardPosition(posX,posY+1));
-        if(whosOnBox(posX,posY+1)< 6)
-            out->push_back(BoardPosition(posX,posY+1));
-    }
-    if(posX>0 && posY<7){
-        if(whosOnBox(posX-1,posY+1)==-1)
-            out->push_back(BoardPosition(posX-1,posY+1));
-        if(whosOnBox(posX-1,posY+1)< 6)
-            out->push_back(BoardPosition(posX-1,posY+1));
-    }
-    if(posX>0){
-        if(whosOnBox(posX-1,posY)==-1)
-            out->push_back(BoardPosition(posX-1,posY));
-        if(whosOnBox(posX-1,posY)< 6)
-            out->push_back(BoardPosition(posX-1,posY));
-    }
-}
-
-
+*/
