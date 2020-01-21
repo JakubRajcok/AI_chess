@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "game.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -17,9 +18,13 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    Game g;
+    void initBoard();
+    void drawBoard(const std::vector<ChessPiece*>&, const std::vector<ChessPiece*>& );
 signals:
     void pohniStrelcom(int, int);
 private slots:
-    void on_pushButton_clicked();
+    void appendLog(int,int);
+    void drawValidMoves(const QList<BoardPosition>&);
 };
 #endif // MAINWINDOW_H

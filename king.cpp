@@ -1,14 +1,14 @@
 #include "king.h"
 
-King::King()
+King::King(BoardPosition *pos, ChessBoard *board): ChessPiece(pos,board)
 {
-
+    findValidMoves();
 }
 
-void King::findValidMoves(BoardPosition &pos){
-    int tmpX=pos.getX();
-    int tmpY=pos.getY();
-    int i=1;
+void King::findValidMoves(){
+    int posX=this->position->getX();
+    int posY=this->position->getY();
+
 
     //there was change, we need to claer data from vector
     this->validMoves.clear();

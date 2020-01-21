@@ -1,20 +1,41 @@
 #include "chesspiece.h"
 #include "boardposition.h"
 #include "chessboard.h"
-
-ChessPiece::ChessPiece(){}
-
-ChessPiece::ChessPiece(BoardPosition &pos, ChessBoard *board)
+#include <QDebug>
+int ChessPiece::getType() const
 {
-    this->position=new BoardPosition(pos.getX(),pos.getY());
+    return type;
+}
+
+BoardPosition *ChessPiece::getPosition() const
+{
+    return position;
+}
+
+void ChessPiece::setPosition(BoardPosition *value)
+{
+    position = value;
+}
+
+ChessPiece::ChessPiece(BoardPosition *pos, ChessBoard *board)
+{
+    this->position=new BoardPosition(pos->getX(),pos->getY());
     this->board=board;
-    this->type=this->board->whosOnBox(pos.getX(),pos.getY());//whosOnBox(pos);
+    this->type=this->board->whosOnBox(pos->getX(),pos->getY());//whosOnBox(pos);
     this->isPlaced=true;
 
-    if(whosOnBox(pos)<6)
+    if(whosOnBox(*pos)<6)
         this->color=0;
     else
         this->color=1;
+
+    qDebug() << "Z tohto:" << this->color << " " <<  this->type;
+
+}
+
+const QList<BoardPosition>& ChessPiece::getValidMoves()
+{
+    return this->validMoves;
 }
 
 ChessPiece::~ChessPiece(){

@@ -1,13 +1,13 @@
 #include "horse.h"
 
-Horse::Horse()
+Horse::Horse(BoardPosition *pos, ChessBoard *board): ChessPiece(pos,board)
 {
-
+    findValidMoves();
 }
 
-void Horse::findValidMoves(BoardPosition& pos){
-    int posX=pos.getX();
-    int posY=pos.getY();
+void Horse::findValidMoves(){
+    int posX=this->position->getX();
+    int posY=this->position->getY();
 
     //there was change, we need to claer data from vector
     this->validMoves.clear();

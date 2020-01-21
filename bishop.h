@@ -6,9 +6,10 @@
 class Bishop:public ChessPiece
 {
 public:
-    Bishop();
+    Bishop(BoardPosition *pos = nullptr, ChessBoard *board = nullptr);
 
-    void findValidMoves(BoardPosition& pos);
+
+    void findValidMoves();
 };
 
 #endif // BISHOP_H

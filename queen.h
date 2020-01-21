@@ -6,9 +6,10 @@
 class Queen:public ChessPiece
 {
 public:
-    Queen();
+    Queen(BoardPosition *pos = nullptr, ChessBoard *board = nullptr);
 
-    void findValidMoves(BoardPosition& pos);
+
+    void findValidMoves();
 };
 
 #endif // QUEEN_H

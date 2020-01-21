@@ -6,9 +6,10 @@
 class Rook:public ChessPiece
 {
 public:
-    Rook();
+    Rook(BoardPosition *pos = nullptr, ChessBoard *board = nullptr);
 
-    void findValidMoves(BoardPosition& pos);
+
+    void findValidMoves();
 };
 
 #endif // ROOK_H

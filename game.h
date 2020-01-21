@@ -8,20 +8,26 @@ class Game : public QObject
 {
     Q_OBJECT
 public:
-    explicit Game(QObject *parent = nullptr);
+    explicit Game( QObject *parent = nullptr);
 
     int gameMode;//////////////////////////////////////////////////////////////
 
 
+
+
+    ChessBoard *getBoard() const;
+    void setBoard(ChessBoard *value);
+
 private:
     int getGameMode();
     void setGameMode(int i);
+    ChessBoard* board;
 
 signals:
-
+    void validMoves(const QList<BoardPosition>&);
 public slots:
 
-    void vyriesPohybStrelca(int,int);
+    void vyriesKlik(int,int);
 };
 
 #endif // GAME_H

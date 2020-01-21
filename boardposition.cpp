@@ -18,10 +18,15 @@ void BoardPosition::setY(int y){
     this->posY=y;
 }
 
-BoardPosition::getX(){
+int BoardPosition::getX() const {
     return this->posX;
 }
 
-BoardPosition::getY(){
+int BoardPosition::getY()const {
     return this->posY;
+}
+
+bool BoardPosition::operator==(const BoardPosition &rhs)
+{
+    return(posX == rhs.posX && posY == rhs.posY);
 }

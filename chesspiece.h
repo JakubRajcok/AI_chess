@@ -5,6 +5,7 @@
 #include "boardposition.h"
 #include "chessboard.h"
 
+class ChessBoard;
 class ChessPiece:public QGraphicsPixmapItem
 {
 
@@ -22,12 +23,7 @@ protected:
 
 public:
 
-    ChessPiece();
-    ChessPiece(BoardPosition &pos, ChessBoard *board);
-
-
-    void setPosition(BoardPosition *position);
-    BoardPosition* getBoardPosition();
+    ChessPiece(BoardPosition *pos = nullptr, ChessBoard *board = nullptr);
 
     void setColor(int color);
     int getColor();
@@ -35,11 +31,15 @@ public:
     void setIsPlaced(bool placed);
     bool getIsPlaced();
 
-    void findValidMoves();
-    QList<BoardPosition>* getValidMoves();
+    const QList<BoardPosition> &getValidMoves();
 
     int whosOnBox(BoardPosition &pos);
     ~ChessPiece();
+
+
+    int getType() const;
+    BoardPosition *getPosition() const;
+    void setPosition(BoardPosition *value);
 
 
 };

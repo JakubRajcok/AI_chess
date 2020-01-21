@@ -6,9 +6,10 @@
 class Horse:public ChessPiece
 {
 public:
-    Horse();
+    Horse(BoardPosition *pos = nullptr, ChessBoard *board = nullptr);
 
-    void findValidMoves(BoardPosition &pos);
+
+    void findValidMoves();
 };
 
 #endif // HORSE_H

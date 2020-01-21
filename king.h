@@ -6,9 +6,10 @@
 class King:public ChessPiece
 {
 public:
-    King();
+    King(BoardPosition *pos = nullptr, ChessBoard *board = nullptr);
 
-    void findValidMoves(BoardPosition &pos);
+
+    void findValidMoves();
 };
 
 #endif // KING_H

@@ -1,4 +1,11 @@
 #include "chessboard.h"
+#include "rook.h"
+#include "horse.h"
+#include "bishop.h"
+#include "queen.h"
+#include "king.h"
+#include "pawn.h"
+#include <QDebug>
 
 /*TODO
  * urob magiu a napoj sa na table
@@ -7,6 +14,16 @@
  * bool chooseChessPiece(BoardPosition position){}
  * void makeMove(BoardPosition from, BoardPosition to){}
 */
+const std::vector<ChessPiece *>& ChessBoard::getChessPieceAliveWhite() const
+{
+    return ChessPieceAliveWhite;
+}
+
+const std::vector<ChessPiece *>& ChessBoard::getChessPieceAliveBlack() const
+{
+    return ChessPieceAliveBlack;
+}
+
 ChessBoard::ChessBoard(){
     this->actualChessPiece=-1;
     //DYNAMIC ALLOC FOR LATER GETTER
@@ -15,7 +32,8 @@ ChessBoard::ChessBoard(){
         arr[i] = new int*[8];
         for (int j = 0; j < 8; ++j)
             arr[i][j] = new int[12];
-    }this->board=arr;
+    }
+    this->board=arr;
 
     //INICIIALIZACIA:
     //Pre buducu lahsiu validaciu su pri polickach bez figurky na zaciatku -1
@@ -23,33 +41,34 @@ ChessBoard::ChessBoard(){
         for(int j=0;j<8;j++){
             if(i==0){
                 //Rad nepesiakov BLACK
+
                 switch (j){
-                    case 0://BLACK Rook
-                        this->board[i][j][3]=1;
-                        this->board[i][7][3]=1;
-                        this->ChessPieceAliveBlack.push_back(new Rook(new BoardPosition(i,j),this));
-                        this->ChessPieceAliveBlack.push_back(new Rook(new BoardPosition(i,7),this));
-                        break;
-                    case 1://BLACK Horseman
-                        this->board[i][j][1]=1;
-                        this->board[i][6][1]=1;
-                        this->ChessPieceAliveBlack.push_back(new Horse(new BoardPosition(i,j),this));
-                        this->ChessPieceAliveBlack.push_back(new Horse(new BoardPosition(i,6),this));
-                        break;
-                    case 2://BLACK Bishop
-                        this->board[i][j][2]=1;
-                        this->board[i][5][2]=1;
-                        this->ChessPieceAliveBlack.push_back(new Bishop(new BoardPosition(i,j),this));
-                        this->ChessPieceAliveBlack.push_back(new Bishop(new BoardPosition(i,5),this));
-                        break;
-                    case 3://BLACK Queen
-                        this->board[i][j][4]=1;
-                        this->ChessPieceAliveBlack.push_back(new Queen(new BoardPosition(i,j),this));
-                        break;
-                    case 4://BLACK King
-                        this->board[i][j][5]=1;
-                        this->ChessPieceAliveBlack.push_back(new King(new BoardPosition(i,j),this));
-                        break;
+                case 0://BLACK Rook
+                    this->board[i][j][3]=1;
+                    this->board[i][7][3]=1;
+                    this->ChessPieceAliveBlack.push_back(new Rook(new BoardPosition(i,j),this));
+                    this->ChessPieceAliveBlack.push_back(new Rook(new BoardPosition(i,7),this));
+                    break;
+                case 1://BLACK Horseman
+                    this->board[i][j][1]=1;
+                    this->board[i][6][1]=1;
+                    this->ChessPieceAliveBlack.push_back(new Horse(new BoardPosition(i,j),this));
+                    this->ChessPieceAliveBlack.push_back(new Horse(new BoardPosition(i,6),this));
+                    break;
+                case 2://BLACK Bishop
+                    this->board[i][j][2]=1;
+                    this->board[i][5][2]=1;
+                    this->ChessPieceAliveBlack.push_back(new Bishop(new BoardPosition(i,j),this));
+                    this->ChessPieceAliveBlack.push_back(new Bishop(new BoardPosition(i,5),this));
+                    break;
+                case 3://BLACK Queen
+                    this->board[i][j][4]=1;
+                    this->ChessPieceAliveBlack.push_back(new Queen(new BoardPosition(i,j),this));
+                    break;
+                case 4://BLACK King
+                    this->board[i][j][5]=1;
+                    this->ChessPieceAliveBlack.push_back(new King(new BoardPosition(i,j),this));
+                    break;
                 }
             }
             else
@@ -58,38 +77,38 @@ ChessBoard::ChessBoard(){
                     this->ChessPieceAliveBlack.push_back(new Pawn(new BoardPosition(i,j),this));
                 }
                 else if(i==6){//White Pawns
-                        this->board[i][j][6]=1;
-                        ChessPieceAliveWhite.push_back(new Pawn(new BoardPosition(i,j),this));
-                        }
-                //Rad nepesiakov WHITE
+                    this->board[i][j][6]=1;
+                    ChessPieceAliveWhite.push_back(new Pawn(new BoardPosition(i,j),this));
+                }
+            //Rad nepesiakov WHITE
                 else if(i==7){
                     switch (j){
-                        case 0://WHITE Rook
-                            this->board[i][j][3+6]=1;
-                            this->board[i][7][3+6]=1;
-                            ChessPieceAliveWhite.push_back(new Rook(new BoardPosition(i,j),this));
-                            ChessPieceAliveWhite.push_back(new Rook(new BoardPosition(i,7),this));
-                            break;
-                        case 1://WHITE Horseman
-                            this->board[i][j][1+6]=1;
-                            this->board[i][6][1+6]=1;
-                            ChessPieceAliveWhite.push_back(new Horse(new BoardPosition(i,j),this));
-                            ChessPieceAliveWhite.push_back(new Horse(new BoardPosition(i,6),this));
-                            break;
-                        case 2://WHITE Bishop
-                            this->board[i][j][2+6]=1;
-                            this->board[i][5][2+6]=1;
-                            ChessPieceAliveWhite.push_back(new Bishop(new BoardPosition(i,j),this));
-                            ChessPieceAliveWhite.push_back(new Bishop(new BoardPosition(i,5),this));
-                            break;
-                        case 3://WHITE Queen
-                            this->board[i][j][4+6]=1;
-                            ChessPieceAliveWhite.push_back(new Queen(new BoardPosition(i,j),this));
-                            break;
-                        case 4://WHITE King
-                            this->board[i][j][5+6]=1;
-                            ChessPieceAliveWhite.push_back(new King(new BoardPosition(i,j),this));
-                            break;
+                    case 0://WHITE Rook
+                        this->board[i][j][3+6]=1;
+                        this->board[i][7][3+6]=1;
+                        ChessPieceAliveWhite.push_back(new Rook(new BoardPosition(i,j),this));
+                        ChessPieceAliveWhite.push_back(new Rook(new BoardPosition(i,7),this));
+                        break;
+                    case 1://WHITE Horseman
+                        this->board[i][j][1+6]=1;
+                        this->board[i][6][1+6]=1;
+                        ChessPieceAliveWhite.push_back(new Horse(new BoardPosition(i,j),this));
+                        ChessPieceAliveWhite.push_back(new Horse(new BoardPosition(i,6),this));
+                        break;
+                    case 2://WHITE Bishop
+                        this->board[i][j][2+6]=1;
+                        this->board[i][5][2+6]=1;
+                        ChessPieceAliveWhite.push_back(new Bishop(new BoardPosition(i,j),this));
+                        ChessPieceAliveWhite.push_back(new Bishop(new BoardPosition(i,5),this));
+                        break;
+                    case 3://WHITE Queen
+                        this->board[i][j][4+6]=1;
+                        ChessPieceAliveWhite.push_back(new Queen(new BoardPosition(i,j),this));
+                        break;
+                    case 4://WHITE King
+                        this->board[i][j][5+6]=1;
+                        ChessPieceAliveWhite.push_back(new King(new BoardPosition(i,j),this));
+                        break;
                     }
                 }else
                     this->board[i][j][0]=-1;
@@ -145,12 +164,7 @@ void ChessBoard::deleteBoard() {
 }
 
 ChessBoard::~ChessBoard(){
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++)
-            delete[] this->board[i][j];
-        delete[] this->board[i];
-    }
-    delete[] getBoard();
+    deleteBoard();
 }
 
 //tejto funkcii postnem policko v podobe BoardPositionu alebo posX a posY a ona mi povie
@@ -172,9 +186,27 @@ int ChessBoard::whosOnBox(int posX, int posY){//Ked Kliknes odpoveda ti board
     //cize nula je black pesiak, 1 black horseman . . .
     for(int i=0;i<12;i++){
         if(this->board[posX][posY][posZ+i] > 0)
-                //returne mi cislo v intervale <0,11>
-                return i;
+            //returne mi cislo v intervale <0,11>
+
+          //  qDebug() << ">>>>>>>>>>>>>>>>>>" << i;
+            return i;
     }
+}
+
+ChessPiece* ChessBoard::chesspieceOnBox(const BoardPosition &bp, int mode){
+
+    if(mode==0){
+        for(auto &cp : this->ChessPieceAliveBlack ){
+            if(cp->getPosition() == &bp)
+                return cp;
+        }
+    }else if(mode == 1){
+        for(auto &cp : this->ChessPieceAliveWhite ){
+            if(cp->getPosition()->getX() == bp.getX() && cp->getPosition()->getY() == bp.getY())
+                return cp;
+        }
+    }
+
 }
 
 /*

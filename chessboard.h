@@ -1,26 +1,28 @@
 #ifndef CHESSBOARD_H
 #define CHESSBOARD_H
 
+#include "chesspiece.h"
 #include "boardposition.h"
 #include <vector>
-#include "chesspiece.h"
 
+class ChessPiece;
 class ChessBoard{
+
 private:
      int ***board;
      int actualChessPiece;
      std::vector<BoardPosition> validMoves;
-     std::vector<ChessPiece> ChessPieceAliveWhite;
-     std::vector<ChessPiece> ChessPieceAliveBlack;
-     std::vector<ChessPiece> ChessPieceDeadWhite{};
-     std::vector<ChessPiece> ChessPieceDeadBlack{};
+     std::vector<ChessPiece*> ChessPieceAliveWhite;
+     std::vector<ChessPiece*> ChessPieceAliveBlack;
+     std::vector<ChessPiece*> ChessPieceDeadWhite{};
+     std::vector<ChessPiece*> ChessPieceDeadBlack{};
 public:
     ChessBoard();
     void draw_board();
     void draw_pawns();
     int*** getBoard();
     std::vector<BoardPosition> *findValidMoves(int posX,int posY);
-    int whosOnBox(  int posX, int posY);
+    int whosOnBox( int posX, int posY);
     void deleteBoard();
     void validMovesBlackPawn(int posX, int posY, std::vector<BoardPosition> *out, BoardPosition &position);
     void validMovesWhitePawn(int posX, int posY, std::vector<BoardPosition> *out, BoardPosition &position);
@@ -35,6 +37,9 @@ public:
     void validMovesBlackKing(int posX, int posY, std::vector<BoardPosition> *out);
     void validMovesWhiteKing(int posX, int posY, std::vector<BoardPosition> *out);
     ~ChessBoard();
+    const std::vector<ChessPiece *>& getChessPieceAliveWhite() const;
+    const std::vector<ChessPiece *> &getChessPieceAliveBlack() const;
+    ChessPiece* chesspieceOnBox(const BoardPosition&, int);
 };
 
 #endif // CHESSBOARD_H
