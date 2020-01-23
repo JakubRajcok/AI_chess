@@ -14,17 +14,20 @@ public:
 
 
 
-
-    ChessBoard *getBoard() const;
-    void setBoard(ChessBoard *value);
-
-private:
     int getGameMode();
     void setGameMode(int i);
+    ChessBoard *getBoard() const;
+    void setBoard(ChessBoard *value);
+    void makeMove(ChessPiece* toByMoved,int row,int col);
+
+private:
+
     ChessBoard* board;
+    ChessPiece* clickedChessPiece;
 
 signals:
     void validMoves(const QList<BoardPosition>&);
+    void updateChessboardSignal(const std::vector<ChessPiece*> &b, const std::vector<ChessPiece*> &w);
 public slots:
 
     void vyriesKlik(int,int);

@@ -2,6 +2,11 @@
 
 Bishop::Bishop(BoardPosition *pos, ChessBoard *board): ChessPiece(pos,board)
 {
+    if(this->type == 2){//black bishop
+        this->iconName = "bishop0.png";
+    }else{
+        this->iconName = "bishop1.png";
+    }
     findValidMoves();
 }
 

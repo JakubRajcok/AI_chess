@@ -7,6 +7,11 @@
 Pawn::Pawn(BoardPosition *pos, ChessBoard *board): ChessPiece(pos,board)
 {
     findValidMoves();
+    if(this->type == 0){//black bishop
+        this->iconName = "pawn0.png";
+    }else{
+        this->iconName = "pawn1.png";
+    }
 }
 
 void Pawn::findValidMoves(){
@@ -27,36 +32,35 @@ void Pawn::findValidMoves(){
                 this->validMoves.append(BoardPosition(posX+2,posY));
             }
         }
-        //is place behind free?
-
+        //is place before free?
         if(this->board->whosOnBox(posX+1,posY)==-1){
             this->validMoves.append(BoardPosition(posX+1,posY));
         }
         //may I attack someone?
-        if(posX<6 && posY<7 && this->board->whosOnBox(posX+1,posY+1)>6){
+        if(posX<6 && posY<7 && this->board->whosOnBox(posX+1,posY+1)>5){
             this->validMoves.append(BoardPosition(posX+1,posY+1));
         }
         //may I attack someone?
-        if(posX<6 && posY>0 && this->board->whosOnBox(posX+1,posY-1)>6){
+        if(posX<6 && posY>0 && this->board->whosOnBox(posX+1,posY-1)>5){
             this->validMoves.append(BoardPosition(posX+1,posY-1));
         }
 
     }else{// chesspiece is white pawn
-        if(posX == 5){
+        if(posX == 6){
             if( this->board->whosOnBox(posX-1,posY) == -1 && this->board->whosOnBox(posX-2,posY) == -1 ){
                 this->validMoves.append(BoardPosition(posX-2,posY));
             }
         }
-        //is place behind free?
+        //is place before free?
         if(posX>1 && this->board->whosOnBox(posX-1,posY)==-1){
             this->validMoves.append(BoardPosition(posX-1,posY));
         }
-        //may I attack someone?
-        if(posX>1 && posY>0 && this->board->whosOnBox(posX-1,posY-1)<=5){
+        //may I attack someone severozapad?
+        if(posX>1 && posY>0 && this->board->whosOnBox(posX-1,posY-1)<=5 && this->board->whosOnBox(posX-1,posY-1)!=-1){
             this->validMoves.append(BoardPosition(posX-1,posY-1));
         }
         //may I attack someone?
-        if(posX>1 && posY<7 && this->board->whosOnBox(posX-1,posY+1)<=5){
+        if(posX>1 && posY<7 && this->board->whosOnBox(posX-1,posY+1)<=5 && this->board->whosOnBox(posX-1,posY+1)!=-1){
             this->validMoves.append(BoardPosition(posX-1,posY+1));
         }
     }

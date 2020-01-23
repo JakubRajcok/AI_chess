@@ -20,6 +20,7 @@ protected:
     bool isPlaced;
     QList <BoardPosition> validMoves;
     ChessBoard *board;
+    QString iconName;
 
 public:
 
@@ -42,6 +43,10 @@ public:
     void setPosition(BoardPosition *value);
 
 
+    QString getIconName() const;
+    void setIconName(const QString &value);
+
+    virtual void findValidMoves() = 0;
 };
 
 #endif // CHESSPIECE_H

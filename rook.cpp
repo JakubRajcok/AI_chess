@@ -3,6 +3,11 @@
 Rook::Rook(BoardPosition *pos, ChessBoard *board) : ChessPiece(pos,board)
 {
     findValidMoves();
+    if(this->type == 3){//black bishop
+        this->iconName = "rook0.png";
+    }else{
+        this->iconName = "rook1.png";
+    }
 }
 
 void Rook::findValidMoves(){
@@ -27,7 +32,7 @@ void Rook::findValidMoves(){
                 i++;
                 tmpY++;
             }else{//jedna sa o figurku supera alebo nasu figurku?
-                if(this->board->whosOnBox(posX,posY+i)>6)
+                if(this->board->whosOnBox(posX,posY+i)>5)
                     this->validMoves.append(BoardPosition(posX,posY+i));
                 break;
             }
@@ -40,7 +45,7 @@ void Rook::findValidMoves(){
                 i++;
                 tmpY--;
             }else{
-                if(this->board->whosOnBox(posX,posY-i)>6)
+                if(this->board->whosOnBox(posX,posY-i)>5)
                     this->validMoves.append(BoardPosition(posX,posY-i));
                 break;
             }
@@ -53,7 +58,7 @@ void Rook::findValidMoves(){
                 i++;
                 tmpX++;
             }else{
-                if(this->board->whosOnBox(posX+i,posY)>6)
+                if(this->board->whosOnBox(posX+i,posY)>5)
                     this->validMoves.append(BoardPosition(posX+i,posY));
                 break;
             }
@@ -65,7 +70,7 @@ void Rook::findValidMoves(){
                 i++;
                 tmpX--;
             }else{
-                if(this->board->whosOnBox(posX-i,posY)>6)
+                if(this->board->whosOnBox(posX-i,posY)>5)
                     this->validMoves.append(BoardPosition(posX-i,posY));
                 break;
             }

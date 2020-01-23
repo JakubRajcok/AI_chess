@@ -17,6 +17,16 @@ void ChessPiece::setPosition(BoardPosition *value)
     position = value;
 }
 
+QString ChessPiece::getIconName() const
+{
+    return iconName;
+}
+
+void ChessPiece::setIconName(const QString &value)
+{
+    iconName = value;
+}
+
 ChessPiece::ChessPiece(BoardPosition *pos, ChessBoard *board)
 {
     this->position=new BoardPosition(pos->getX(),pos->getY());
@@ -28,8 +38,6 @@ ChessPiece::ChessPiece(BoardPosition *pos, ChessBoard *board)
         this->color=0;
     else
         this->color=1;
-
-    qDebug() << "Z tohto:" << this->color << " " <<  this->type;
 
 }
 
