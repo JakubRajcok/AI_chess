@@ -26,7 +26,6 @@ int BoardPosition::getY()const {
     return this->posY;
 }
 
-bool BoardPosition::operator==(const BoardPosition &rhs)
-{
+bool BoardPosition::operator==(const BoardPosition &rhs){
     return(posX == rhs.posX && posY == rhs.posY);
 }

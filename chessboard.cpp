@@ -7,26 +7,46 @@
 #include "pawn.h"
 #include <QDebug>
 
-/*TODO
- * urob magiu a napoj sa na table
- * findValidmoves-> ked mas tabulku, tak vysviet policka moznych tahov a potom ho vrat
- * sprav spravny vypis
- * bool chooseChessPiece(BoardPosition position){}
- * void makeMove(BoardPosition from, BoardPosition to){}
+/*
+ * Sekcia v ktorej su implementove funkcie na zistovanie validnych tahov
+ * TODO
+ *  *Prezentacia
+ *  *Sprav Spolocny .h file pre vsetky classy
+ *  *Spravne volad destruktory
+ *  *Make the chess more responsible
+ *  *Vycentrovat figutky v bunkach
+ *  *Ciernobiele vykreslovanie policok
+ *  *Make player viable
+ *  *Pozri sa na konkretne figurky sa skus spravit ich optimalizaciu
+ *  *kedy je pesiak na konci (cekuj posY aby nesiel tam kam nema)
+ *  *vymena figyrky za novy
+ *  *Rosada
+ *  *asi potrebujes zadefinovat sach premenu boolean, aby si nerobil rosadu po sachu..
+ *  *NAJVACIS PRUSER, NEMOZES SA POHNUT, AK ODOKRYJES KRALA A MAS AUTOMATICKY SACH, (PRED CLICK ECENT ZISTI, CI MOZES POHNUT)
+ *      -mozno sa skus pytat od krala a vo funkcii volaj vsetky pohyby ostatnych figurok, kore koliduju s tym polickom
+ *  *Kingovia neriesia ziadne sachy paty ani maty... dorob
+ *
 */
-const std::vector<ChessPiece *>& ChessBoard::getChessPieceAliveWhite() const
-{
+
+std::vector<ChessPiece *>& ChessBoard::getChessPieceAliveWhite(){
     return ChessPieceAliveWhite;
 }
 
-const std::vector<ChessPiece *>& ChessBoard::getChessPieceAliveBlack() const
-{
+std::vector<ChessPiece *>& ChessBoard::getChessPieceAliveBlack(){
     return ChessPieceAliveBlack;
+}
+
+std::vector<ChessPiece *> &ChessBoard::getChessPieceDeadBlack(){
+    return this->ChessPieceDeadBlack;
+}
+
+std::vector<ChessPiece *> &ChessBoard::getChessPieceDeadWhite(){
+    return this->ChessPieceDeadWhite;
 }
 
 ChessBoard::ChessBoard(){
     this->actualChessPiece=-1;
-    //DYNAMIC ALLOC FOR LATER GETTER
+    //DYNAMIC ALLOC for my main chessBoard
     int ***arr = new int**[8];
     for (int i = 0; i < 8; ++i) {
         arr[i] = new int*[8];
@@ -35,6 +55,7 @@ ChessBoard::ChessBoard(){
     }
     this->board=arr;
 
+    //Filling my board with zeros
     for(int i=0; i<8; i++){
         for (int j=0;j<8;j++){
             for (int k=0;k<12;k++){
@@ -43,13 +64,13 @@ ChessBoard::ChessBoard(){
         }
     }
 
-    //INICIIALIZACIA:
-    //Pre buducu lahsiu validaciu su pri polickach bez figurky na zaciatku -1
+    //INICIALIZATION board:
+    //For future, i set -1 at the start of 3rd layer in my boar fo EMPTY box
+    //Here Im setting every chessBox for riht chessPiece ID/Type, which contains this chessBox
+    //There are ones in specific position of 3rd board layer, which represents chessPiece on it
     for(int i=0;i<8;i++){
         for(int j=0;j<8;j++){
             if(i==0){
-                //Rad nepesiakov BLACK
-
                 switch (j){
                 case 0://BLACK Rook
                     this->board[i][j][3]=1;
@@ -108,14 +129,14 @@ ChessBoard::ChessBoard(){
         }
     }
 
-
-
+    //INICIALIZATION alive chessPieces:
+    //Here Im inicializing new chesspieces of specific type
+    //  and im filling the aliveChesspieces containers
     for(int i=0;i<8;i++){
         for(int j=0;j<8;j++){
             if(i==0){
-                //Rad nepesiakov BLACK
-
                 switch (j){
+                /*Black chessPieces*/
                 case 0://BLACK Rook
                     this->board[i][j][3]=1;
                     this->board[i][7][3]=1;
@@ -149,11 +170,11 @@ ChessBoard::ChessBoard(){
                     this->board[i][j][0]=1;
                     this->ChessPieceAliveBlack.push_back(new Pawn(new BoardPosition(i,j),this));
                 }
+                /*White Chesspieces*/
                 else if(i==6){//White Pawns
                     this->board[i][j][6]=1;
                     ChessPieceAliveWhite.push_back(new Pawn(new BoardPosition(i,j),this));
                 }
-            //Rad nepesiakov WHITE
                 else if(i==7){
                     switch (j){
                     case 0://WHITE Rook
@@ -187,43 +208,7 @@ ChessBoard::ChessBoard(){
                     this->board[i][j][0]=-1;
         }
     }
-
-
 }
-
-/*//____________________________________________________________________________________________________________________________hier liebes
-void ChessBoard::draw_board(){
-    for(int i=0;i<8;i++){
-        if(i>0)cout<<endl;
-        for(int j=0;j<8;j++){
-            if(this->board[i][j][0]!=-1)
-                cout<< 1 << " " << flush;
-            else
-                cout<< 0 << " " << flush;
-        }
-    }cout<<endl<<endl;
-}
-
-void ChessBoard::draw_pawns(){
-    for(int i=0;i<8;i++){
-        if(i>0)cout<<endl;
-        for(int j=0;j<8;j++){
-            if(this->board[i][j][0]!=-1){
-                for(int k=0;k<12;k++){
-                    //NIEJE TU ZADRHEL BLACK PAWNS SA PROSTE NACHADZAJU NA 0. POZICII
-                    if(this->board[i][j][k]==1){
-                        cout<< k << " "<<flush;
-                        break;
-                    }
-                }
-
-            }
-            else
-                cout<< 0 << " " << flush;
-        }
-    }cout<<endl<<endl;
-}
-*/
 
 int*** ChessBoard::getBoard(){
     return this->board;
@@ -242,39 +227,42 @@ ChessBoard::~ChessBoard(){
     deleteBoard();
 }
 
-//tejto funkcii postnem policko v podobe BoardPositionu alebo posX a posY a ona mi povie
-//ako na tom dane policko je
+//This function returns the specific type of chessPiece base on board position
 int ChessBoard::whosOnBox(int posX, int posY){//Ked Kliknes odpoveda ti board
-    /*******************
-     * ret> ID of pawn *
-     * ret -1 > Empty  *
-     *******************/
+    /********************
+     * ret> ID of piece *
+     * ret -1 > Empty   *
+     ********************/
     const int posZ=0;
-    //v poli  sa nachadzaju jednotky a nuly, TAKZE NEVIES co konkretne to je
 
-    //If teh box is empty
+    //If chess box is empty
     if(this->board[posX][posY][posZ] == -1){
         return -1;
     }
 
-    //vratim index kde je figurka ulozena a tym viem, o co sa jedna
-    //cize nula je black pesiak, 1 black horseman . . .
+    //returning index, where is one, thats ID of my chesspiece
+    //for example "0" is black pawn, "6" is white pawn etc.
     for(int i=0;i<12;i++){
         if(this->board[posX][posY][posZ+i] > 0)
-            //returne mi cislo v intervale <0,11>
+            //Return of int in interval <0,11>
             return i;
     }
 
+    throw("Invalid 3rd layer array in board -> chessBoard");
 }
 
+//Function which returns Chesspiece based on posted gameMode
+//If its gameMode == 0 (it means that its black turn), then im looking in black chessPieces
 ChessPiece* ChessBoard::chesspieceOnBox(const BoardPosition &bp, int mode){
 
-    if(mode==0){
+    //Im looking for chesspiece to move or chesspiece to kickOut (black's move or white kicking)
+    if(mode==0 || mode==3){
         for(auto &cp : this->ChessPieceAliveBlack ){
             if(cp->getPosition()->getX() == bp.getX() && cp->getPosition()->getY() == bp.getY())
                 return cp;
         }
-    }else if(mode == 1){
+    //Im looking for chesspiece to move or chesspiece to kickOut (white's move or black kicking)
+    }else if(mode == 1 || mode==2){
         for(auto &cp : this->ChessPieceAliveWhite ){
             if(cp->getPosition()->getX() == bp.getX() && cp->getPosition()->getY() == bp.getY())
                 return cp;
@@ -283,61 +271,3 @@ ChessPiece* ChessBoard::chesspieceOnBox(const BoardPosition &bp, int mode){
     return nullptr;
 
 }
-
-/*
- * Sekcia v ktorej su implementove funkcie na zistovanie validnych tahov
- * TODO
- *  *pesiak vyhadzovanie do kriza
- *  *kedy je pesiak na konci (cekuj posY aby nesiel tam kam nema)
- *  *vymena figyrky za novy
- *  *nevyhadzujes VLASTNE figurky
- *  *  *Nezabudaj ze pri vyhadzovani davas do pola aj poziciu figurky na vyhodnie
- *  *Horseman ta vola
- *  *toto si si nasiel pri vezi?  'i=1, tmpY=posY;' to sa da?
- *  *asi potrebujes zadefinovat sach premenu boolean, aby si nerobil rosadu po sachu..
- *  *NAJVACIS PRUSER, NEMOZES SA POHNUT, AK ODOKRYJES KRALA A MAS AUTOMATICKY SACH, (PRED CLICK ECENT ZISTI, CI MOZES POHNUT)
- *      -mozno sa skus pytat od krala a vo funkcii volaj vsetky pohyby ostatnych figurok, kore koliduju s tym polickom
- *  *Kingovia neriesia ziadne sachy paty ani maty... dorob
- *  */
-
-/*
-std::vector<BoardPosition>* ChessBoard::findValidMoves(int posX,int posY){
-    //return array which contains pairs of positions and len of array
-
-    int chessPiece=whosOnBox(posX,posY);
-    std::vector<BoardPosition> *out = new std::vector<BoardPosition>();//pozor, treba v cas aj dealokovat______________________________VELKE POZOR!
-    BoardPosition position;
-    switch (chessPiece){
-        case(-1):
-            delete[]out;//__________________________________________________________________________________________________opat delete a free
-            return nullptr;
-        case (0)://Pawn black
-
-        case 6://Pawn white
-
-        case (3)://Rook black
-
-        case 9://Rook white
-
-        case (1)://Horseman black
-
-        case 7://Horseman white
-
-        case (2)://Bishop black
-
-        case 8://bishop White
-
-        case (4)://Queen black
-
-        case 10://Queen white
-
-        case (5)://king black
-
-        case 11://King white
-
-        default:
-            //cerr<<"findValidErr";//_____________________________________________________________________________________definuj NEDEFINOVANE
-            break;
-    }
-}
-*/

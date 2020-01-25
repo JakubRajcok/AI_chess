@@ -21,10 +21,10 @@ private:
     Game g;
     void initBoard();
     void drawBoard(const std::vector<ChessPiece*>&, const std::vector<ChessPiece*>& );
-    bool incialized;
 signals:
     void pohniStrelcom(int, int);
 private slots:
+    void appendLog(const QList<BoardPosition>&);
     void appendLog(int,int);
     void drawValidMoves(const QList<BoardPosition>&);
     void updateChessboardSlot(const std::vector<ChessPiece*> &b, const std::vector<ChessPiece*> &w);

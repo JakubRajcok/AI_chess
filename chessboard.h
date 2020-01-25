@@ -37,8 +37,10 @@ public:
     void validMovesBlackKing(int posX, int posY, std::vector<BoardPosition> *out);
     void validMovesWhiteKing(int posX, int posY, std::vector<BoardPosition> *out);
     ~ChessBoard();
-    const std::vector<ChessPiece *>& getChessPieceAliveWhite() const;
-    const std::vector<ChessPiece *> &getChessPieceAliveBlack() const;
+    std::vector<ChessPiece *> &getChessPieceAliveWhite();
+    std::vector<ChessPiece *> &getChessPieceAliveBlack();
+    std::vector<ChessPiece *> &getChessPieceDeadBlack();
+    std::vector<ChessPiece *> &getChessPieceDeadWhite();
     ChessPiece* chesspieceOnBox(const BoardPosition&, int);
 };
 

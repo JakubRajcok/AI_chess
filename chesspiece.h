@@ -47,6 +47,7 @@ public:
     void setIconName(const QString &value);
 
     virtual void findValidMoves() = 0;
+
 };
 
 #endif // CHESSPIECE_H
