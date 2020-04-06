@@ -64,4 +64,7 @@ void Pawn::findValidMoves(){
             this->validMoves.append(BoardPosition(posX-1,posY+1));
         }
     }
+
+    //am I checking?
+    this->checking = this->amIChecking();
 }

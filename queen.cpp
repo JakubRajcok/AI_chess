@@ -250,4 +250,7 @@ void Queen::findValidMoves(){
             }
         }
     }
+
+    //am I checking?
+    this->checking = this->amIChecking();
 }

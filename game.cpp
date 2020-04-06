@@ -6,8 +6,10 @@
 #include <algorithm>
 
 Game::Game(QObject *parent) : QObject(parent), board{new ChessBoard}{
-    this->gameMode = 0;
+    this->gameMode = 1;
     this->clickedChessPiece=nullptr;
+    this->blackChecked=false;
+    this->whiteChecked=false;
 }
 
 ChessBoard *Game::getBoard() const{
@@ -46,12 +48,18 @@ void Game::kickChessPieceOut(ChessPiece* toBeKicked){
     if(toBeKicked->getType() >= 6){
         begin = this->board->getChessPieceAliveWhite().begin();
         end = this->board->getChessPieceAliveWhite().end();
+
+        //aliveChessPieces = this->board->getChessPieceAliveWhite();/**/
+
         deadChessPieces = this->board->getChessPieceDeadWhite();
         this->gameMode = 1;
     //If the white player is taking the black chesspiece
     }else if(toBeKicked->getType() < 6){
         begin = this->board->getChessPieceAliveBlack().begin();
         end = this->board->getChessPieceAliveBlack().end();
+
+        //aliveChessPieces = this->board->getChessPieceAliveBlack();/**/
+
         deadChessPieces = this->board->getChessPieceDeadBlack();
         this->gameMode = 0;
     }
@@ -105,6 +113,13 @@ void Game::makeMove(ChessPiece* toBeMoved,int row,int col){
     //Redefining old position atribute in chessPiece
     toBeMoved->getPosition()->setX(newX);
     toBeMoved->getPosition()->setY(newY);
+
+    //finding out, if am i checking
+    //I am checking gamemode like this, becouse they are setted after valid move for opponent
+    if(this->gameMode == 0)
+        this->blackChecked = toBeMoved->amIChecking();
+    else if(this->gameMode == 1)
+        this->whiteChecked = toBeMoved->amIChecking();
 
     return;
 }

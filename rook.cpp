@@ -126,4 +126,7 @@ void Rook::findValidMoves(){
             }
         }
     }
+
+    //am I checking?
+    this->checking = this->amIChecking();
 }

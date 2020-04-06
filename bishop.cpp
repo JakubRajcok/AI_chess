@@ -138,4 +138,7 @@ void Bishop::findValidMoves(){
             }
         }
     }
+
+    //am I checking?
+    this->checking = this->amIChecking();
 }

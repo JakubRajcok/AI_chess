@@ -23,7 +23,8 @@ public:
     bool checkIfClickedValidMove(int col, int row);
 
 private:
-
+    bool blackChecked;
+    bool whiteChecked;
     ChessBoard* board;
     ChessPiece* clickedChessPiece;
 

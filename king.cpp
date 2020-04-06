@@ -3,7 +3,7 @@
 King::King(BoardPosition *pos, ChessBoard *board): ChessPiece(pos,board)
 {
     findValidMoves();
-    if(this->type == 5){//black bishop
+    if(this->type == 5){//black king
         this->iconName = "king0.png";
     }else{
         this->iconName = "king1.png";

@@ -22,11 +22,25 @@ void ChessPiece::setIconName(const QString &value){
     iconName = value;
 }
 
+bool ChessPiece::amIChecking(){
+    //if there are valid moves, check, if enemy King is checked
+    //if valid moves exists and are bigger then 0
+    if(this->validMoves.size() > 0){
+        for(BoardPosition &cp : this->validMoves) {
+            //if my valid moves contains boardposition with oposite king
+            if(this->board->whosOnBox(cp.getX(),cp.getY()) == 5 || this->board->whosOnBox(cp.getX(),cp.getY()) == 11)
+                return true;
+        }
+    }
+    return false;
+}
+
 ChessPiece::ChessPiece(BoardPosition *pos, ChessBoard *board){
     this->position=new BoardPosition(pos->getX(),pos->getY());
     this->board=board;
     this->type=this->board->whosOnBox(pos->getX(),pos->getY());
     this->isPlaced=true;
+    this->checking=false;
     if(whosOnBox(*pos)<6)
         this->color=0;
     else

@@ -86,4 +86,7 @@ void Horse::findValidMoves(){
                 this->validMoves.append(BoardPosition(posX-2,posY-1));
         }
     }
+
+    //am I checking?
+    this->checking = this->amIChecking();
 }

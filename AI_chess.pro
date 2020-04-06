@@ -31,6 +31,7 @@ SOURCES += \
     rook.cpp
 
 HEADERS += \
+    Libraries.h \
     bishop.h \
     boardposition.h \
     chessboard.h \

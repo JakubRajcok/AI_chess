@@ -10,6 +10,7 @@
 /*
  * Sekcia v ktorej su implementove funkcie na zistovanie validnych tahov
  * TODO
+ *  *game a vyhadzocanie
  *  *Prezentacia
  *  *Sprav Spolocny .h file pre vsetky classy
  *  *Spravne volad destruktory
@@ -36,11 +37,11 @@ std::vector<ChessPiece *>& ChessBoard::getChessPieceAliveBlack(){
     return ChessPieceAliveBlack;
 }
 
-std::vector<ChessPiece *> &ChessBoard::getChessPieceDeadBlack(){
+std::vector<ChessPiece *>& ChessBoard::getChessPieceDeadBlack(){
     return this->ChessPieceDeadBlack;
 }
 
-std::vector<ChessPiece *> &ChessBoard::getChessPieceDeadWhite(){
+std::vector<ChessPiece *>& ChessBoard::getChessPieceDeadWhite(){
     return this->ChessPieceDeadWhite;
 }
 

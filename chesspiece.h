@@ -18,6 +18,7 @@ protected:
     BoardPosition *position;
     int color; //0-black, 1-white
     bool isPlaced;
+    bool checking;
     QList <BoardPosition> validMoves;
     ChessBoard *board;
     QString iconName;
@@ -45,6 +46,8 @@ public:
 
     QString getIconName() const;
     void setIconName(const QString &value);
+
+    bool amIChecking ();
 
     virtual void findValidMoves() = 0;
 
