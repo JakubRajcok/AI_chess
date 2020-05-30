@@ -10,6 +10,7 @@ public:
 
 
     void findValidMoves();
+    bool checking();
 };
 
 #endif // KING_H

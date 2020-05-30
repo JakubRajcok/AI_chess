@@ -2,6 +2,7 @@
 #include "boardposition.h"
 #include "chessboard.h"
 #include <QDebug>
+
 int ChessPiece::getType() const{
     return type;
 }
@@ -48,7 +49,7 @@ ChessPiece::ChessPiece(BoardPosition *pos, ChessBoard *board){
 
 }
 
-const QList<BoardPosition>& ChessPiece::getValidMoves(){
+QList<BoardPosition>& ChessPiece::getValidMoves(){
     return this->validMoves;
 }
 

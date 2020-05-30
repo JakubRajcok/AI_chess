@@ -26,12 +26,10 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     pawn.cpp \
-    player.cpp \
     queen.cpp \
     rook.cpp
 
 HEADERS += \
-    Libraries.h \
     bishop.h \
     boardposition.h \
     chessboard.h \
@@ -41,7 +39,6 @@ HEADERS += \
     king.h \
     mainwindow.h \
     pawn.h \
-    player.h \
     queen.h \
     rook.h
 

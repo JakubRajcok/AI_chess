@@ -68,13 +68,15 @@ void MainWindow::drawBoard(const std::vector<ChessPiece*> &b, const std::vector<
     }
 }
 
+void MainWindow::appendLog(const QString s){
+    ui->log->append(s);
+}
+
 void MainWindow::appendLog(const QList<BoardPosition> & validMoves){
     for(const auto& c: validMoves){
         ui->log->append("("+QString('A' + c.getY()) + "," + QString::number(1 +c.getX())+  ")");
     }
-
 }
-
 
 void MainWindow::appendLog(int row, int col){
     ui->log->append(QString::number(row) + " " + QString::number(col) + "Gamemode: " + QString::number(this->g.gameMode) );

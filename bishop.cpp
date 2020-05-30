@@ -10,6 +10,7 @@ Bishop::Bishop(BoardPosition *pos, ChessBoard *board): ChessPiece(pos,board)
     findValidMoves();
 }
 
+
 void Bishop::findValidMoves(){
     int posX=this->position->getX();
     int posY=this->position->getY();
@@ -22,7 +23,7 @@ void Bishop::findValidMoves(){
     int i=1;
 
     if(this->type == 2){// if it is black bishop, or we can say if it is black chesspiece too
-        while(tmpX < 7 && tmpY > 0){//Pohyb na Severovychod
+        while(tmpX < 7 && tmpY > 0){//Move to northeast //SV
             if(this->board->whosOnBox(posX+i,posY-i)==-1){
                 this->validMoves.append(BoardPosition(posX+i,posY-i));
                 i++;
@@ -37,7 +38,7 @@ void Bishop::findValidMoves(){
         i=1;
         tmpX=posX;
         tmpY=posY;
-        while(tmpX < 7 && tmpY < 7){//Pohyb na JuhoVychod
+        while(tmpX < 7 && tmpY < 7){//Move to southeast //JV
             if(this->board->whosOnBox(posX+i,posY+i)==-1){
                 this->validMoves.append(BoardPosition(posX+i,posY+i));
                 i++;
@@ -52,7 +53,7 @@ void Bishop::findValidMoves(){
         i=1;
         tmpX=posX;
         tmpY=posY;
-        while(tmpX > 0 && tmpY < 7){//Pohyb na JuhoZapad
+        while(tmpX > 0 && tmpY < 7){//Move to southwest //JZ
             if(this->board->whosOnBox(posX-i,posY+i)== -1){
                 this->validMoves.append(BoardPosition(posX-i,posY+i));
                 i++;
@@ -67,7 +68,7 @@ void Bishop::findValidMoves(){
         i=1;
         tmpX=posX;
         tmpY=posY;
-        while(tmpX > 0 && tmpY > 0){//Pohyb na SeveroZapad
+        while(tmpX > 0 && tmpY > 0){//Move to northwest //SZ
             if(this->board->whosOnBox(posX-i,posY-i)== -1){
                 this->validMoves.append(BoardPosition(posX-i,posY-i));
                 i++;
@@ -80,7 +81,7 @@ void Bishop::findValidMoves(){
             }
         }
     }else{
-        while(tmpX < 7 && tmpY > 0){//Pohyb na Severovychod
+        while(tmpX < 7 && tmpY > 0){//Move to northeast
             if(this->board->whosOnBox(posX+i,posY-i)==-1){
                 this->validMoves.append(BoardPosition(posX+i,posY-i));
                 i++;
@@ -95,7 +96,7 @@ void Bishop::findValidMoves(){
         i=1;
         tmpX=posX;
         tmpY=posY;
-        while(tmpX < 7 && tmpY < 7){//Pohyb na JuhoVychod
+        while(tmpX < 7 && tmpY < 7){//Pohyb na southeast
             if(this->board->whosOnBox(posX+i,posY+i)==-1){
                 this->validMoves.append(BoardPosition(posX+i,posY+i));
                 i++;
@@ -110,7 +111,7 @@ void Bishop::findValidMoves(){
         i=1;
         tmpX=posX;
         tmpY=posY;
-        while(tmpX > 0 && tmpY < 7){//Pohyb na JuhoZapad
+        while(tmpX > 0 && tmpY < 7){//Pohyb na southwest
             if(this->board->whosOnBox(posX-i,posY+i)== -1){
                 this->validMoves.append(BoardPosition(posX-i,posY+i));
                 i++;
@@ -125,7 +126,7 @@ void Bishop::findValidMoves(){
         i=1;
         tmpX=posX;
         tmpY=posY;
-        while(tmpX > 0 && tmpY > 0){//Pohyb na SeveroZapad
+        while(tmpX > 0 && tmpY > 0){//Pohyb na northwest
             if(this->board->whosOnBox(posX-i,posY-i)== -1){
                 this->validMoves.append(BoardPosition(posX-i,posY-i));
                 i++;

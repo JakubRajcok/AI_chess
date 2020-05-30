@@ -10,23 +10,12 @@
 /*
  * Sekcia v ktorej su implementove funkcie na zistovanie validnych tahov
  * TODO
- *  *game a vyhadzocanie
- *  *Prezentacia
- *  *Sprav Spolocny .h file pre vsetky classy
  *  *Spravne volad destruktory
  *  *Make the chess more responsible
- *  *Vycentrovat figutky v bunkach
  *  *Ciernobiele vykreslovanie policok
- *  *Make player viable
  *  *Pozri sa na konkretne figurky sa skus spravit ich optimalizaciu
- *  *kedy je pesiak na konci (cekuj posY aby nesiel tam kam nema)
- *  *vymena figyrky za novy
+ *  *pesiak prechod na koniec sachovnice
  *  *Rosada
- *  *asi potrebujes zadefinovat sach premenu boolean, aby si nerobil rosadu po sachu..
- *  *NAJVACIS PRUSER, NEMOZES SA POHNUT, AK ODOKRYJES KRALA A MAS AUTOMATICKY SACH, (PRED CLICK ECENT ZISTI, CI MOZES POHNUT)
- *      -mozno sa skus pytat od krala a vo funkcii volaj vsetky pohyby ostatnych figurok, kore koliduju s tym polickom
- *  *Kingovia neriesia ziadne sachy paty ani maty... dorob
- *
 */
 
 std::vector<ChessPiece *>& ChessBoard::getChessPieceAliveWhite(){
@@ -162,6 +151,8 @@ ChessBoard::ChessBoard(){
                     break;
                 case 4://BLACK King
                     this->board[i][j][5]=1;
+                    //this->setBlackKing(new King(new BoardPosition(i,j),this));
+                    //this->ChessPieceAliveBlack.push_back(this->getBlackKing());
                     this->ChessPieceAliveBlack.push_back(new King(new BoardPosition(i,j),this));
                     break;
                 }
@@ -202,6 +193,7 @@ ChessBoard::ChessBoard(){
                         break;
                     case 4://WHITE King
                         this->board[i][j][5+6]=1;
+                        //this->setWhiteKing(new King(new BoardPosition(i,j),this));
                         ChessPieceAliveWhite.push_back(new King(new BoardPosition(i,j),this));
                         break;
                     }

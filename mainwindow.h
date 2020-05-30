@@ -24,6 +24,7 @@ private:
 signals:
     void pohniStrelcom(int, int);
 private slots:
+    void appendLog(QString);
     void appendLog(const QList<BoardPosition>&);
     void appendLog(int,int);
     void drawValidMoves(const QList<BoardPosition>&);

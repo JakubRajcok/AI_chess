@@ -10,10 +10,6 @@ class ChessPiece:public QGraphicsPixmapItem
 {
 
 protected:
-
-    /*
-
-    */
     int type; // number from 0 to 11 representing exact type of chesspiece
     BoardPosition *position;
     int color; //0-black, 1-white
@@ -33,7 +29,7 @@ public:
     void setIsPlaced(bool placed);
     bool getIsPlaced();
 
-    const QList<BoardPosition> &getValidMoves();
+    QList<BoardPosition> &getValidMoves();
 
     int whosOnBox(BoardPosition &pos);
     ~ChessPiece();

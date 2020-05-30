@@ -23,14 +23,14 @@ void Queen::findValidMoves(){
         int tmpY=posY;
         int i=1;
 
-        //Skopirovany black rook
-        while(tmpY < 7){//Prezeranie policok na pravo
-            //Prezerame ten buduci, preto len do 6, kedze mame 8 policok, ideme od nuly a pozerame 1 dopredu
+        //Copied black rook
+        while(tmpY < 7){//Right
+            //Attentio of overflow the array, thats the reason of going to 6
             if(this->board->whosOnBox(posX,posY+i)==-1){
                 this->validMoves.append(BoardPosition(posX,posY+i));
                 i++;
                 tmpY++;
-            }else{//jedna sa o figurku supera alebo nasu figurku?
+            }else{//our or enemy chesspiece?
                 if(this->board->whosOnBox(posX,posY+i)>=6)
                     this->validMoves.append(BoardPosition(posX,posY+i));
                 break;
@@ -38,7 +38,7 @@ void Queen::findValidMoves(){
         }
         i=1;
         tmpY=posY;
-        while(tmpY > 0){//Prezeranie policok na lavo
+        while(tmpY > 0){//Left
             if(this->board->whosOnBox(posX,posY-i)==-1){
                 this->validMoves.append(BoardPosition(posX,posY-i));
                 i++;
@@ -51,7 +51,7 @@ void Queen::findValidMoves(){
         }
         i=1;
         tmpY=posY;
-        while(tmpX < 7){//Prezeranie policek pod figurkou
+        while(tmpX < 7){//Under
             if(this->board->whosOnBox(posX+i,posY)==-1){
                 this->validMoves.append(BoardPosition(posX+i,posY));
                 i++;
@@ -63,7 +63,7 @@ void Queen::findValidMoves(){
             }
         }
         i=1; tmpX=posX;
-        while(tmpX > 0){//Prezeranie policek nad figurkou
+        while(tmpX > 0){//Up
             if(this->board->whosOnBox(posX-i,posY)==-1){
                 this->validMoves.append(BoardPosition(posX-i,posY));
                 i++;
@@ -75,8 +75,8 @@ void Queen::findValidMoves(){
             }
         }
         i=1;tmpX=posX;tmpY=posY;
-        //Skopirovany black bishop
-        while(tmpX < 7 && tmpY > 0){//Pohyb na Severovychod
+        //Copied black bishop
+        while(tmpX < 7 && tmpY > 0){//SV
             if(this->board->whosOnBox(posX+i,posY-i)==-1){
                 this->validMoves.append(BoardPosition(posX+i,posY-i));
                 i++;
@@ -91,7 +91,7 @@ void Queen::findValidMoves(){
         i=1;
         tmpX=posX;
         tmpY=posY;
-        while(tmpX < 7 && tmpY < 7){//Pohyb na JuhoVychod
+        while(tmpX < 7 && tmpY < 7){//JV
             if(this->board->whosOnBox(posX+i,posY+i)==-1){
                 this->validMoves.append(BoardPosition(posX+i,posY+i));
                 i++;
@@ -106,7 +106,7 @@ void Queen::findValidMoves(){
         i=1;
         tmpX=posX;
         tmpY=posY;
-        while(tmpX > 0 && tmpY < 7){//Pohyb na JuhoZapad
+        while(tmpX > 0 && tmpY < 7){//JZ
             if(this->board->whosOnBox(posX-i,posY+i)== -1){
                 this->validMoves.append(BoardPosition(posX-i,posY+i));
                 i++;
@@ -121,7 +121,7 @@ void Queen::findValidMoves(){
         i=1;
         tmpX=posX;
         tmpY=posY;
-        while(tmpX > 0 && tmpY > 0){//Pohyb na SeveroZapad
+        while(tmpX > 0 && tmpY > 0){//SZ
             if(this->board->whosOnBox(posX-i,posY-i)== -1){
                 this->validMoves.append(BoardPosition(posX-i,posY-i));
                 i++;
@@ -134,19 +134,18 @@ void Queen::findValidMoves(){
             }
         }
     }else{
-        //Kralovna obsahuje vezu a strelca do kopy, hor sa na kopirovanie a modli sa, aby neboli strelec s konom chybne
         int tmpX=posX;
         int tmpY=posY;
         int i=1;
 
-        //skopirovany white rook
-        while(tmpY < 7){//Prezeranie policok na pravo
-            //Prezerame ten buduci, preto len do 6, kedze mame 8 policok, ideme od nuly a pozerame 1 dopredu
+        //copied white rook
+        while(tmpY < 7){//right
+            //only to 6, becouse we can overflow
             if(this->board->whosOnBox(posX,posY+i)==-1){
                 this->validMoves.append(BoardPosition(posX,posY+i));
                 i++;
                 tmpY++;
-            }else{//jedna sa o figurku supera alebo nasu figurku?
+            }else{//our or enemy chesspiece?
                 if(this->board->whosOnBox(posX,posY+i)<6)
                     this->validMoves.append(BoardPosition(posX,posY+i));
                 break;
@@ -154,7 +153,7 @@ void Queen::findValidMoves(){
         }
         i=1;
         tmpY=posY;
-        while(tmpY > 0){//Prezeranie policok na lavo
+        while(tmpY > 0){//Left
             if(this->board->whosOnBox(posX,posY-i)==-1){
                 this->validMoves.append(BoardPosition(posX,posY-i));
                 i++;
@@ -166,7 +165,7 @@ void Queen::findValidMoves(){
             }
         }
         i=1;
-        while(tmpX < 7){//Prezeranie policek pod figurkou
+        while(tmpX < 7){//Under
             if(this->board->whosOnBox(posX+i,posY)==-1){
                 this->validMoves.append(BoardPosition(posX+i,posY));
                 i++;
@@ -178,7 +177,7 @@ void Queen::findValidMoves(){
             }
         }
         i=1; tmpX=posX;
-        while(tmpX > 0){//Prezeranie policek nad figurkou
+        while(tmpX > 0){//Up
             if(this->board->whosOnBox(posX-i,posY)==-1){
                 this->validMoves.append(BoardPosition(posX-i,posY));
                 i++;
@@ -192,7 +191,7 @@ void Queen::findValidMoves(){
         i=1;tmpX=posX;tmpY=posY;
 
         //Skopirovany white bishop
-        while(tmpX < 7 && tmpY > 0){//Pohyb na Severovychod
+        while(tmpX < 7 && tmpY > 0){//SV
             if(this->board->whosOnBox(posX+i,posY-i)==-1){
                 this->validMoves.append(BoardPosition(posX+i,posY-i));
                 i++;
@@ -207,7 +206,7 @@ void Queen::findValidMoves(){
         i=1;
         tmpX=posX;
         tmpY=posY;
-        while(tmpX < 7 && tmpY < 7){//Pohyb na JuhoVychod
+        while(tmpX < 7 && tmpY < 7){//JV
             if(this->board->whosOnBox(posX+i,posY+i)==-1){
                 this->validMoves.append(BoardPosition(posX+i,posY+i));
                 i++;
@@ -222,7 +221,7 @@ void Queen::findValidMoves(){
         i=1;
         tmpX=posX;
         tmpY=posY;
-        while(tmpX > 0 && tmpY < 7){//Pohyb na JuhoZapad
+        while(tmpX > 0 && tmpY < 7){//JZ
             if(this->board->whosOnBox(posX-i,posY+i)== -1){
                 this->validMoves.append(BoardPosition(posX-i,posY+i));
                 i++;
@@ -237,7 +236,7 @@ void Queen::findValidMoves(){
         i=1;
         tmpX=posX;
         tmpY=posY;
-        while(tmpX > 0 && tmpY > 0){//Pohyb na SeveroZapad
+        while(tmpX > 0 && tmpY > 0){//SZ
             if(this->board->whosOnBox(posX-i,posY-i)== -1){
                 this->validMoves.append(BoardPosition(posX-i,posY-i));
                 i++;

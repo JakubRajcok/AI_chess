@@ -1,0 +1,3 @@
+D:/GitRepositories/AI_chess/cmake-build-debug/CMakeFiles/Chess.dir
+D:/GitRepositories/AI_chess/cmake-build-debug/CMakeFiles/edit_cache.dir
+D:/GitRepositories/AI_chess/cmake-build-debug/CMakeFiles/rebuild_cache.dir
