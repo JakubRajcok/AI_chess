@@ -18,6 +18,7 @@ private:
      std::vector<ChessPiece*> ChessPieceDeadBlack{};
 public:
     ChessBoard();
+    ChessBoard(QString fen);
     void draw_board();
     void draw_pawns();
     int*** getBoard();
@@ -42,6 +43,7 @@ public:
     std::vector<ChessPiece *> &getChessPieceDeadBlack();
     std::vector<ChessPiece *> &getChessPieceDeadWhite();
     ChessPiece* chesspieceOnBox(const BoardPosition&, int);
+    int evaluateFenLetToType(QChar ch);
 };
 
 #endif // CHESSBOARD_H

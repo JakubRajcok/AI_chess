@@ -33,8 +33,15 @@ public:
     void solveEnPassant(int whoWasClicked, int col, int row);
     void makeEnPassant(ChessPiece* toBeMoved,int row,int col);
     void clearingChessBoxes(int oldY, int newX, int*** brd, int oldX, int newY, int enPassY, int enPassX);
+    void solveCastling(int col, int row);
+    void updateBlackCastling(int oldY, int typeOfChessPiece, int oldX);
+    void updateWhiteCastling(int typeOfChessPiece, int oldX, int oldY);
+    void makeCastling(int row,int col);
 
-
+    void setToPosValid(int typeOfChessPiece, int row, int col, int*** brd);
+    void makeToPosValid(int row, int col, int*** brd, int typeOfChessPiece);
+    BoardPosition fenNotationToBoardPostion(QString fenNot);
+    void computerVsComputer();
 private:
     int moveCounter;
     int halfMoveCounter=0;
@@ -47,6 +54,7 @@ private:
     ChessBoard* board;
     ChessPiece* clickedChessPiece;
     QString fen;
+    bool PCvsPC = true;
 
 signals:
     void appendLog(QString s);

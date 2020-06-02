@@ -47,6 +47,8 @@ public:
 
     virtual void findValidMoves() = 0;
 
+    void setType(int value);
+    void setBoard(ChessBoard *value);
 };
 
 #endif // CHESSPIECE_H

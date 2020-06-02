@@ -123,6 +123,106 @@ void Game::kickChessPieceOut(ChessPiece* toBeKicked){
     toBeKicked->getPosition()->setY(-1);
 }
 
+void Game::makeToPosValid(int row, int col, int*** brd, int typeOfChessPiece)
+{
+    for(int i=0;i<12;i++){
+        if(i == typeOfChessPiece)
+            brd[row][col][i] = 1;
+        else
+            brd[row][col][i]=0;
+    }
+}
+
+void Game::makeCastling(int row,int col){
+    int typeOfChessPiece = this->clickedChessPiece->getType();
+    int*** brd = board->getBoard();
+    ChessPiece* king = this->clickedChessPiece;
+    ChessPiece* rook;
+
+    if(typeOfChessPiece == 5){
+        //clearing box of king and rook, because everything other is empty
+        if(row == 0 && col == 2){
+            //Settig our rook which will be moved
+            //I have to change gamemode becouse its special situation
+            rook = this->board->chesspieceOnBox(BoardPosition(0,0),0);
+            //Clearing of kings and rooks position
+            clearingChessBoxes(0,0,brd,0,4);
+            //Making "to" position valid Black Rook
+            makeToPosValid(0, 3, brd, 3);
+
+            rook->getPosition()->setX(0);
+            rook->getPosition()->setY(3);
+        }else if(row == 0 && col == 6){
+            //Settig our rook which will be moved
+            //I have to change gamemode becouse its special situation
+            rook = this->board->chesspieceOnBox(BoardPosition(0,7),0);
+            //Clearing of kings and rooks position
+            clearingChessBoxes(0,7,brd,0,4);
+            //Making "to" position valid Black Rook
+            makeToPosValid(0, 5, brd, 3);
+
+            rook->getPosition()->setX(0);
+            rook->getPosition()->setY(5);
+        }
+
+        //Making "to" position valid King
+        makeToPosValid(row, col, brd, typeOfChessPiece);
+        //Updating pos of the king
+        king->getPosition()->setX(row);
+        king->getPosition()->setY(col);
+
+    }else if(typeOfChessPiece == 11){
+        //clearing box of king and rook, because everything other is empty
+        if(row == 7 && col == 2){
+            //Settig our rook which will be moved
+            //I have to change gamemode becouse its special situation
+            rook = this->board->chesspieceOnBox(BoardPosition(7,0),1);
+            //Clearing of kings and rooks position
+            clearingChessBoxes(7,0,brd,7,4);
+            //Making "to" position valid White Rook
+            makeToPosValid(7, 3, brd, 9);
+
+            rook->getPosition()->setX(7);
+            rook->getPosition()->setY(3);
+        }else if(row == 7 && col == 6){
+            //Settig our rook which will be moved
+            //I have to change gamemode becouse its special situation
+            rook = this->board->chesspieceOnBox(BoardPosition(7,7),1);
+            //Clearing of kings and rooks position
+            clearingChessBoxes(7,7,brd,7,4);
+            //Making "to" position valid White Rook
+            makeToPosValid(7, 5, brd, 9);
+
+            rook->getPosition()->setX(7);
+            rook->getPosition()->setY(5);
+        }
+
+        //Making "to" position valid King
+        makeToPosValid(row, col, brd, typeOfChessPiece);
+        //Updating pos of the king
+        king->getPosition()->setX(row);
+        king->getPosition()->setY(col);
+    }
+
+    //Incrementing full move counter
+    //Incerementing half move counter, it resetes after move of Pawn or any kind of capture
+    this->moveCounter ++;
+    if(typeOfChessPiece == 0 || typeOfChessPiece == 6 || this->board->whosOnBox(row, col) != -1)
+        halfMoveCounter = 0;
+    else
+        halfMoveCounter ++;
+
+    if(this->gameMode == 2)
+        this->gameMode = 1;
+    else if(this->gameMode == 3)
+        this->gameMode = 0;
+
+    this->clickedChessPiece = nullptr;
+
+    generateFEN();
+
+}
+
 void Game::makeEnPassant(ChessPiece* toBeMoved,int row,int col){
     int typeOfChessPiece = toBeMoved->getType();
     int oldX= toBeMoved->getPosition()->getX();
@@ -170,8 +270,31 @@ void Game::makeEnPassant(ChessPiece* toBeMoved,int row,int col){
 
     generateFEN();
 
+    this->clickedChessPiece = nullptr;
     return;
 
+}
+
+void Game::updateBlackCastling(int oldY, int typeOfChessPiece, int oldX)
+{
+    if(typeOfChessPiece == 5){
+        this->blackKingSideCastling = false;
+        this->blackQueenSideCastling = false;
+    }else if(oldX == 0 && oldY == 0)
+        this->blackQueenSideCastling = false;
+    else if(oldX == 0 && oldY == 7)
+        this->blackKingSideCastling = false;
+}
+
+void Game::updateWhiteCastling(int typeOfChessPiece, int oldX, int oldY)
+{
+    if(typeOfChessPiece == 11){
+        this->whiteKingSideCastling = false;
+        this->whiteQueenSideCastling = false;
+    }else if(oldX == 7 && oldY == 0)
+        this->whiteQueenSideCastling = false;
+    else if(oldX == 7 && oldY == 7)
+        this->whiteKingSideCastling = false;
 }
 
 void Game::makeMove(ChessPiece* toBeMoved,int row,int col){
@@ -194,7 +317,6 @@ void Game::makeMove(ChessPiece* toBeMoved,int row,int col){
     if(whosOnBox != -1 ){
         kickChessPieceOut(toBeKicked);
     }
-
 
     //making "to" position valid
     //If black pawn reached end of the chessboard
@@ -236,11 +358,41 @@ void Game::makeMove(ChessPiece* toBeMoved,int row,int col){
     if(pawnChange)
         solvePawnChange();
 
+    //Check if was moved rook, or king to cancel castling options
+    updateBlackCastling(oldY, typeOfChessPiece, oldX);
+    updateWhiteCastling(typeOfChessPiece, oldX, oldY);
+
     generateFEN();
 
     return;
 }
 
+void Game::computerVsComputer(){
+    bool gameover=false;
+
+    while(1){
+        //White wins
+        for(unsigned int i=0; i < board->getChessPieceDeadBlack().size();i++ ){
+            if(board->getChessPieceDeadBlack().at(i)->getType()==5)
+                gameover=true;
+        }
+        //Black wins
+        for(unsigned int i=0; i < board->getChessPieceDeadWhite().size();i++ ){
+            if(board->getChessPieceDeadWhite().at(i)->getType()==11)
+                gameover=true;
+        }
+
+        /*
+        engineGetMove(this.fen);
+        fenNotationToBoardPostion();
+        solveClick(fenNotationToBoardPostion().posx,fenNotationToBoardPostion().posy);
+        */
+
+        if(gameover)
+            break;
+    }
+
+}
 
 bool Game::checkIfClickedValidMove(int row, int col){
     //I the clicked box was in valid moves of clicked chessPiece
@@ -275,49 +427,116 @@ int Game::convertChessAnotationPos1(QChar n){
 }
 
 void Game::solveEnPassant(int whoWasClicked, int col, int row){
-
+    QString FEN;
     if(whoWasClicked == 0 && row == 4){
         this->clickedChessPiece = this->board->chesspieceOnBox(BoardPosition(row,col),this->gameMode);
         //if is enpassant in fen
-        if(!this->fen.right(6).contains('-')){
-            QString FEN = this->fen.right(6);
+        if(!this->fen.right(7).contains('-')){
+            if(this->moveCounter<10 && this->fen.length()>6)
+                FEN = this->fen.right(6);
+            else if (this->moveCounter>10 && this->halfMoveCounter<10 && this->fen.length()>7)
+                FEN = this->fen.right(7);
+            else if(this->fen.length()>8)
+                FEN = this->fen.right(8);
+
             this->clickedChessPiece->findValidMoves();
             QChar A = FEN[1] ;
             BoardPosition outA =  BoardPosition( A.digitValue()-1, convertChessAnotationPos1(FEN[0]));
             this->clickedChessPiece->getValidMoves().append( outA );
             //emit validMoves(this->clickedChessPiece->getValidMoves());
         }
-        //this->gameMode++;
-        //return;
+
     }else if (whoWasClicked == 6 && row == 3){
         this->clickedChessPiece = this->board->chesspieceOnBox(BoardPosition(row,col),this->gameMode);
         //if is enpassant in fen
-        if(!this->fen.right(6).contains('-')){
-            QString FEN = this->fen.right(6);
+        if(!this->fen.right(7).contains('-')){
+            if(this->moveCounter<10 && this->fen.length()>7)
+                FEN = this->fen.right(6);
+            else if (this->moveCounter>10 && this->halfMoveCounter<10 && this->fen.length()>8)
+                FEN = this->fen.right(7);
+            else if(this->fen.length()>9)
+                FEN = this->fen.right(8);
             this->clickedChessPiece->findValidMoves();
             QChar B = FEN[1] ;
             BoardPosition outB =  BoardPosition( B.digitValue()-1,convertChessAnotationPos1(FEN[0]));
             this->clickedChessPiece->getValidMoves().append( outB );
             //emit validMoves(this->clickedChessPiece->getValidMoves());
         }
-        //this->gameMode++;
-        //return;
+
+    }
+}
+
+void Game::solveCastling(int col, int row){
+    //Inic of fen string with the part of castlings
+    //check if the FEN exist, mind that 20 is totaly random ;)
+    if(clickedChessPiece->getType() == 11 && row == 4 && col == 7 && this->fen.length() > 20){
+       QString FEN = this->fen.right(13);
+
+       //getting the part of string, where is castling info stored
+       /*on the end is everytime info of the actual turn, thats our position
+                //but there is exception of b3 and b6 enpassant situation      */
+       if( FEN.lastIndexOf('b') != -1 && !FEN.contains("b3") && !FEN.contains("b6"))
+           FEN = FEN.mid(FEN.lastIndexOf('b'));
+       else
+           FEN = FEN.mid(FEN.lastIndexOf('w'));
+
+
+       //if there is white queen side castling possible, add it to valid moves
+       if(FEN.contains('Q') && this->board->whosOnBox(7,0)== 9 && this->board->whosOnBox(7,1)==-1 && this->board->whosOnBox(7,2)==-1 && this->board->whosOnBox(7,3)==-1){
+           this->clickedChessPiece->getValidMoves().append(BoardPosition(7,2));
+       }
+
+       //if there is white king side castling possible, add it to valid moves
+       if(FEN.contains('K') && this->board->whosOnBox(7,7)== 9 && this->board->whosOnBox(7,6)==-1 && this->board->whosOnBox(7,5)==-1){
+           this->clickedChessPiece->getValidMoves().append(BoardPosition(7,6));
+       }
+
+    }else if(clickedChessPiece->getType() == 5 && row == 4 && col == 0 && this->fen.length() > 20){
+        QString FEN = this->fen.right(13);
+        //getting the part of string, where is castling info stored
+        /*on the end is everytime info of the actual turn, thats our position
+                 //but there is exception of b3 and b6 enpassant situation      */
+        if( FEN.lastIndexOf('b') != -1 && !FEN.contains("b3") && !FEN.contains("b6"))
+            FEN = FEN.mid(FEN.lastIndexOf('b'));
+        else
+            FEN = FEN.mid(FEN.lastIndexOf('w'));
+
+            //if there is black queen side csatling possible, add it to valid moves
+        if(FEN.contains('q') && this->board->whosOnBox(0,0)== 3 && this->board->whosOnBox(0,1)==-1 && this->board->whosOnBox(0,2)==-1 && this->board->whosOnBox(0,3)==-1){
+            this->clickedChessPiece->getValidMoves().append(BoardPosition(0,2));
+        }
+        //if there is black king side castling possible, add it to valid moves
+        if(FEN.contains('k') && this->board->whosOnBox(0,7)== 3 && this->board->whosOnBox(0,6)==-1 && this->board->whosOnBox(0,5)==-1){
+            this->clickedChessPiece->getValidMoves().append(BoardPosition(0,6));
+        }
+
     }
 }
 
 void Game::solveClick(int row, int col){
 
     int whoWasClicked = this->board->whosOnBox(row,col);
+    /*
+    int arr[64]{};
+    int k=0;
+    for( int i=0;i<8;i++){
+        for (int j = 0; j<8;j++){
+            arr[k]= this->board->whosOnBox(i,j);
+            k++;
+        }
+    }
+    */
 
     //If the place where i clicked whas empty box
     if (whoWasClicked == -1){
         //If my chesspiece was chosen and i want to move on empty box
         if(gameMode == 2 || gameMode ==3){
 
-
+            //If peasent was clicked and now Iam clicking empty box
             if( (clickedChessPiece->getType() == 0 ) || (clickedChessPiece->getType() == 6)){
                 bool enPassant = false;
 
+                //if got peasant min one move, if its not ours, then check for another possible
                 if(clickedChessPiece->getValidMoves().size() > 0){
                     int oldY = clickedChessPiece->getPosition()->getY();
                     int newY = clickedChessPiece->getValidMoves().at(0).getY();
@@ -336,9 +555,18 @@ void Game::solveClick(int row, int col){
                     emit updateChessboardSignal(this->board->getChessPieceAliveBlack(), this->board->getChessPieceAliveWhite());
                     return;
                 }
-
             }
 
+            //The king was clicked and now is player looking for empty boxes/castling
+            if( (clickedChessPiece->getType() == 5 ) || (clickedChessPiece->getType() == 11)){
+                if( (row ==0 && col ==2 ) || (row ==0 && col ==6) || (row ==7 && col ==2) || (row ==7 && col ==6) ){
+                    int gmode = this->gameMode;
+                    makeCastling(row, col);
+                    emit updateChessboardSignal(this->board->getChessPieceAliveBlack(), this->board->getChessPieceAliveWhite());
+                    return;
+                }
+            }
+            //The king was clicked and now is player looking for empty boxes/castling
 
             //Finding valid moves for clicked Chesspiece
             this->clickedChessPiece->findValidMoves();
@@ -380,7 +608,9 @@ void Game::solveClick(int row, int col){
             this->clickedChessPiece = this->board->chesspieceOnBox(BoardPosition(row,col),this->gameMode);
             this->clickedChessPiece->findValidMoves();
             emit appendLog(this->clickedChessPiece->getValidMoves());
-            solveEnPassant(whoWasClicked, col, row);
+            if(clickedChessPiece->getType() == 0)
+                solveEnPassant(whoWasClicked, col, row);
+            solveCastling(row, col);
 
             //If i cicked corectly, but my chosen chesspiece got no validmoves
             if(this->clickedChessPiece->getValidMoves().size()<=0){
@@ -411,7 +641,10 @@ void Game::solveClick(int row, int col){
             this->clickedChessPiece = this->board->chesspieceOnBox(BoardPosition(row,col),this->gameMode);
             this->clickedChessPiece->findValidMoves();
             emit appendLog(this->clickedChessPiece->getValidMoves());
-            solveEnPassant(whoWasClicked, col, row);
+            if(clickedChessPiece->getType() == 6)
+                solveEnPassant(whoWasClicked, col, row);
+            //if we clicked white king and if he is on the right starting position
+            solveCastling(row, col);
 
             //If i cicked corectly, but my chosen chesspiece got no validmoves
             if(this->clickedChessPiece->getValidMoves().size()<=0){
@@ -422,7 +655,7 @@ void Game::solveClick(int row, int col){
             //If i clicked corectly and there are valid moves
             //Inicialization of clicked chesspiese and changing the gameMode
             this->gameMode = this->gameMode+2;
-            emit validMoves(this->clickedChessPiece->getValidMoves());
+            emit validMoves(this->clickedChessPiece->getValidMoves());/*CRAAAAAAAAAAASHSHSAHAHAHA po vela tahoch je problem s pesiakom*/
             return;
         }
 
@@ -445,6 +678,12 @@ void Game::solveClick(int row, int col){
             emit updateChessboardSignal(this->board->getChessPieceAliveBlack(), this->board->getChessPieceAliveWhite());
         }
     }
+}
+
+BoardPosition Game::fenNotationToBoardPostion(QString fenNot){
+    QChar letter = fenNot[0];
+    int row = fenNot[1].digitValue();
+    return BoardPosition( row ,convertChessAnotationPos1(letter) );
 }
 
 //Generating one letter from official FEN notation, in case of empty box, it returns 1
@@ -581,7 +820,7 @@ QString Game::generateFEN(){
     if(this->blackQueenSideCastling)
         FEN.append("q");
     if(!this->whiteKingSideCastling && !this->whiteQueenSideCastling && !this->blackQueenSideCastling && !this->blackQueenSideCastling)
-        FEN.append(" ");
+        FEN.append("-");
 
     //Finding out, if there is valid en'passant situation eg. if was pawn moved 2 boxes ahead
     int row = (int)this->movedChessPiece/10;

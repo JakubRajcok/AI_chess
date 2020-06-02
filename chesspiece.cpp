@@ -7,6 +7,10 @@ int ChessPiece::getType() const{
     return type;
 }
 
+void ChessPiece::setColor(int color){
+    this->color=color;
+}
+
 BoardPosition *ChessPiece::getPosition() const{
     return position;
 }
@@ -36,8 +40,19 @@ bool ChessPiece::amIChecking(){
     return false;
 }
 
+void ChessPiece::setType(int value)
+{
+    type = value;
+}
+
+void ChessPiece::setBoard(ChessBoard *value)
+{
+    board = value;
+}
+
 ChessPiece::ChessPiece(BoardPosition *pos, ChessBoard *board){
-    this->position=new BoardPosition(pos->getX(),pos->getY());
+    //this->position=new BoardPosition(pos->getX(),pos->getY());
+    this->position = pos;;
     this->board=board;
     this->type=this->board->whosOnBox(pos->getX(),pos->getY());
     this->isPlaced=true;
@@ -51,10 +66,6 @@ ChessPiece::ChessPiece(BoardPosition *pos, ChessBoard *board){
 
 QList<BoardPosition>& ChessPiece::getValidMoves(){
     return this->validMoves;
-}
-
-ChessPiece::~ChessPiece(){
-    delete(this->position);
 }
 
 //Overrided function of chessBoard, for better handling with code
@@ -71,4 +82,8 @@ int ChessPiece::whosOnBox(BoardPosition &pos){
 
 void ChessPiece:: setIsPlaced(bool placed){
     this->isPlaced=placed;
+}
+
+ChessPiece:: ~ChessPiece(){
+    delete this->getPosition();
 }
