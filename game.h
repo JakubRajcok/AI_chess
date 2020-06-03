@@ -39,7 +39,6 @@ public:
     void makeCastling(int row,int col);
 
     void setToPosValid(int typeOfChessPiece, int row, int col, int*** brd);
-    void makeToPosValid(int row, int col, int*** brd, int typeOfChessPiece);
     BoardPosition fenNotationToBoardPostion(QString fenNot);
     void computerVsComputer();
 private:

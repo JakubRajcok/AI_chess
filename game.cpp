@@ -10,6 +10,7 @@ Game::Game(QObject *parent) : QObject(parent), board{new ChessBoard}{
     this->gameMode = 1;
     this->clickedChessPiece=nullptr;
     this->moveCounter=1;
+    this->fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
 }
 
@@ -123,16 +124,6 @@ void Game::kickChessPieceOut(ChessPiece* toBeKicked){
     toBeKicked->getPosition()->setY(-1);
 }
 
-void Game::makeToPosValid(int row, int col, int*** brd, int typeOfChessPiece)
-{
-    for(int i=0;i<12;i++){
-        if(i == typeOfChessPiece)
-            brd[row][col][i] = 1;
-        else
-            brd[row][col][i]=0;
-    }
-}
-
 void Game::makeCastling(int row,int col){
     int typeOfChessPiece = this->clickedChessPiece->getType();
     int*** brd = board->getBoard();
@@ -148,7 +139,8 @@ void Game::makeCastling(int row,int col){
             //Clearing of kings and rooks position
             clearingChessBoxes(0,0,brd,0,4);
             //Making "to" position valid Black Rook
-            makeToPosValid(0, 3, brd, 3);
+            brd[0][3][0] = 0;
+            brd[0][3][3] = 1;
 
             rook->getPosition()->setX(0);
             rook->getPosition()->setY(3);
@@ -157,30 +149,34 @@ void Game::makeCastling(int row,int col){
             //I have to change gamemode becouse its special situation
             rook = this->board->chesspieceOnBox(BoardPosition(0,7),0);
             //Clearing of kings and rooks position
-            clearingChessBoxes(0,7,brd,0,4);
+            clearingChessBoxes(7,0,brd,0,4);
             //Making "to" position valid Black Rook
-            makeToPosValid(0, 5, brd, 3);
+            brd[0][5][0] = 0;
+            brd[0][5][3] = 1;
 
             rook->getPosition()->setX(0);
             rook->getPosition()->setY(5);
         }
 
         //Making "to" position valid King
-        makeToPosValid(row, col, brd, typeOfChessPiece);
+        brd[row][col][0] = 0;
+        brd[row][col][5] = 1;
         //Updating pos of the king
         king->getPosition()->setX(row);
         king->getPosition()->setY(col);
-
+        this->blackKingSideCastling = false;
+        this->blackQueenSideCastling = false;
     }else if(typeOfChessPiece == 11){
         //clearing box of king and rook, because everything other is empty
         if(row == 7 && col == 2){
-            //Settig our rook which will be moved
+            //Setting our rook which will be moved
             //I have to change gamemode becouse its special situation
             rook = this->board->chesspieceOnBox(BoardPosition(7,0),1);
             //Clearing of kings and rooks position
-            clearingChessBoxes(7,0,brd,7,4);
+            clearingChessBoxes(0,7,brd,7,4);
             //Making "to" position valid White Rook
-            makeToPosValid(7, 3, brd, 9);
+            brd[7][3][0] = 0;
+            brd[7][3][9] = 1;
 
             rook->getPosition()->setX(7);
             rook->getPosition()->setY(3);
@@ -190,27 +186,29 @@ void Game::makeCastling(int row,int col){
             rook = this->board->chesspieceOnBox(BoardPosition(7,7),1);
             //Clearing of kings and rooks position
             clearingChessBoxes(7,7,brd,7,4);
-            //Making "to" position valid White Rook
-            makeToPosValid(7, 5, brd, 9);
+            //Making "to" position valid White Rook //(int oldY, int newX, int*** brd, int oldX, int newY){
+            brd[7][5][0] = 0;
+            brd[7][5][9] = 1;
 
             rook->getPosition()->setX(7);
             rook->getPosition()->setY(5);
         }
 
         //Making "to" position valid King
-        makeToPosValid(row, col, brd, typeOfChessPiece);
+        brd[row][col][0] = 0;
+        brd[row][col][11] = 1;
         //Updating pos of the king
         king->getPosition()->setX(row);
         king->getPosition()->setY(col);
+        this->whiteKingSideCastling = false;
+        this->whiteQueenSideCastling = false;
     }
 
     //Incrementing full move counter
-    //Incerementing half move counter, it resetes after move of Pawn or any kind of capture
-    this->moveCounter ++;
-    if(typeOfChessPiece == 0 || typeOfChessPiece == 6 || this->board->whosOnBox(row, col) != -1)
-        halfMoveCounter = 0;
-    else
-        halfMoveCounter ++;
+    //Incerementing half move counter, becouse its not pawn advence or capture
+    halfMoveCounter ++;
+    if(typeOfChessPiece == 5)
+        moveCounter++;
 
     if(this->gameMode == 2)
         this->gameMode = 1;
@@ -262,11 +260,13 @@ void Game::makeEnPassant(ChessPiece* toBeMoved,int row,int col){
 
     //Incrementing full move counter
     //Incerementing half move counter, it resetes after move of Pawn or any kind of capture
-    this->moveCounter ++;
     if(typeOfChessPiece == 0 || typeOfChessPiece == 6 || whosOnBox != -1)
         halfMoveCounter = 0;
     else
         halfMoveCounter ++;
+
+    if(typeOfChessPiece == 0)
+        moveCounter++;
 
     generateFEN();
 
@@ -341,7 +341,8 @@ void Game::makeMove(ChessPiece* toBeMoved,int row,int col){
 
     //Incrementing full move counter
     //Incerementing half move counter, it resetes after move of Pawn or any kind of capture
-    this->moveCounter ++;
+    if(typeOfChessPiece<6)
+        this->moveCounter ++;
     if(typeOfChessPiece == 0 || typeOfChessPiece == 6 || whosOnBox != -1)
         halfMoveCounter = 0;
     else
@@ -432,11 +433,11 @@ void Game::solveEnPassant(int whoWasClicked, int col, int row){
         this->clickedChessPiece = this->board->chesspieceOnBox(BoardPosition(row,col),this->gameMode);
         //if is enpassant in fen
         if(!this->fen.right(7).contains('-')){
-            if(this->moveCounter<10 && this->fen.length()>6)
+            if( !this->fen.at(this->fen.length()-2).isDigit() )
                 FEN = this->fen.right(6);
-            else if (this->moveCounter>10 && this->halfMoveCounter<10 && this->fen.length()>7)
+            else if ( !this->fen.at(this->fen.length()-5).isDigit() )
                 FEN = this->fen.right(7);
-            else if(this->fen.length()>8)
+            else
                 FEN = this->fen.right(8);
 
             this->clickedChessPiece->findValidMoves();
@@ -450,11 +451,11 @@ void Game::solveEnPassant(int whoWasClicked, int col, int row){
         this->clickedChessPiece = this->board->chesspieceOnBox(BoardPosition(row,col),this->gameMode);
         //if is enpassant in fen
         if(!this->fen.right(7).contains('-')){
-            if(this->moveCounter<10 && this->fen.length()>7)
+            if( !this->fen.at(this->fen.length()-2).isDigit() )
                 FEN = this->fen.right(6);
-            else if (this->moveCounter>10 && this->halfMoveCounter<10 && this->fen.length()>8)
+            else if ( !this->fen.at(this->fen.length()-5).isDigit() )
                 FEN = this->fen.right(7);
-            else if(this->fen.length()>9)
+            else
                 FEN = this->fen.right(8);
             this->clickedChessPiece->findValidMoves();
             QChar B = FEN[1] ;
@@ -516,7 +517,7 @@ void Game::solveCastling(int col, int row){
 void Game::solveClick(int row, int col){
 
     int whoWasClicked = this->board->whosOnBox(row,col);
-    /*
+
     int arr[64]{};
     int k=0;
     for( int i=0;i<8;i++){
@@ -525,7 +526,7 @@ void Game::solveClick(int row, int col){
             k++;
         }
     }
-    */
+
 
     //If the place where i clicked whas empty box
     if (whoWasClicked == -1){
@@ -834,11 +835,11 @@ QString Game::generateFEN(){
     FEN.append(" ");
 
     //Half move number
-    FEN.append( QString::number ((int)halfMoveCounter));
+    FEN.append( QString::number ((int) halfMoveCounter ));
     FEN.append(" ");
 
     //Full move number
-    FEN.append( QString::number ((int)moveCounter/2) );
+    FEN.append( QString::number ((int)moveCounter) );
 
     this->fen = FEN;
     return FEN;
