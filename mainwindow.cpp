@@ -65,11 +65,11 @@ void MainWindow::drawBoard(const std::vector<ChessPiece*> &b, const std::vector<
     }
 
     for(auto& cp : b){
-        ui->tableWidget->item(cp->getPosition()->getX(),cp->getPosition()->getY())->setIcon(QIcon(PRO_PWD+ QString(QDir::separator()+"icons"+QDir::separator()) + cp->getIconName())); //("\\icons\\")
+        ui->tableWidget->item(cp->getPosition()->getX(),cp->getPosition()->getY())->setIcon(QIcon(PRO_PWD+ QString(QDir::separator()+ QString("icons") +QDir::separator()) + cp->getIconName())); //("\\icons\\")
     }
 
     for(auto& cp : w){
-        ui->tableWidget->item(cp->getPosition()->getX(),cp->getPosition()->getY())->setIcon(QIcon(PRO_PWD+ QString(QDir::separator()+"icons"+QDir::separator()) + cp->getIconName()));
+        ui->tableWidget->item(cp->getPosition()->getX(),cp->getPosition()->getY())->setIcon(QIcon(PRO_PWD+ QString(QDir::separator()+QString("icons")+QDir::separator()) + cp->getIconName()));
     }
 }
 
