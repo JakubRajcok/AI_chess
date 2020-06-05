@@ -3,6 +3,7 @@
 #include <QLabel>
 #include <QDebug>
 #include <QPixmap>
+#include <QDir>
 #include <QListWidgetItem>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -64,11 +65,11 @@ void MainWindow::drawBoard(const std::vector<ChessPiece*> &b, const std::vector<
     }
 
     for(auto& cp : b){
-        ui->tableWidget->item(cp->getPosition()->getX(),cp->getPosition()->getY())->setIcon(QIcon(PRO_PWD+ QString("\\icons\\") + cp->getIconName()));
+        ui->tableWidget->item(cp->getPosition()->getX(),cp->getPosition()->getY())->setIcon(QIcon(PRO_PWD+ QString(QDir::separator()+"icons"+QDir::separator()) + cp->getIconName())); //("\\icons\\")
     }
 
     for(auto& cp : w){
-        ui->tableWidget->item(cp->getPosition()->getX(),cp->getPosition()->getY())->setIcon(QIcon(PRO_PWD+ QString("\\icons\\") + cp->getIconName()));
+        ui->tableWidget->item(cp->getPosition()->getX(),cp->getPosition()->getY())->setIcon(QIcon(PRO_PWD+ QString(QDir::separator()+"icons"+QDir::separator()) + cp->getIconName()));
     }
 }
 
