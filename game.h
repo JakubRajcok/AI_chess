@@ -27,7 +27,7 @@ public:
     QChar intToLetter(int chessId);
 
     QString createLetterFromRow(int pos);
-    void solvePawnChange();
+    void solvePawnChange(int row, int col);
     int convertChessAnotationPos1(QChar n);
 
     void solveEnPassant(int whoWasClicked, int col, int row);
@@ -41,6 +41,9 @@ public:
     void setToPosValid(int typeOfChessPiece, int row, int col, int*** brd);
     BoardPosition fenNotationToBoardPostion(QString fenNot);
     void computerVsComputer();
+    QString getChesspieceToChange() const;
+    void setChesspieceToChange(const QString &value);
+
 private:
     int moveCounter;
     int halfMoveCounter=0;
@@ -54,15 +57,19 @@ private:
     ChessPiece* clickedChessPiece;
     QString fen;
     bool PCvsPC = true;
+    bool pawnChange = false;
+    QString chesspieceToChange;
 
 signals:
     void appendLog(QString s);
     void appendLog(const QList<BoardPosition>&);
     void validMoves(const QList<BoardPosition>&);
     void updateChessboardSignal(const std::vector<ChessPiece*> &b, const std::vector<ChessPiece*> &w);
+    void updateKickedPiecesSignal(const std::vector<ChessPiece*> &b, const std::vector<ChessPiece*> &w);
 public slots:
 
     void solveClick(int,int);
+    void deadPieceSelectedSlot(QString);
 };
 
 #endif // GAME_H

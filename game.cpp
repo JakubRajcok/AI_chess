@@ -66,11 +66,12 @@ void Game::clearingChessBoxes(int oldY, int newX, int*** brd, int oldX, int newY
     }
 }
 
-void Game::solvePawnChange(){
+void Game::solvePawnChange(int row, int col){
     /*Here is actually set the board to position like empty, if there was chesspiece
-     *then it was legitible kicked and moved to kickedchesspieces it means, that now
+     *then it was legitible kicked and moved to kickedchesspieces, it is same with
+     *our moved Pawn. It means, that now
      * we have to:
-     * 1) move our pawn to our deadchesspieces
+     * 1) move our pawn to our deadchesspieces ,DONE
      * 2) emit signal of opening new interface with players dead chesspieces
      * 3) choosing my prefered one //eventualy keep eye, if player can see his 1st line on chessboard
      * 4) then player has to click on one of the free boxes (if there is not then just change gamemode)
@@ -78,13 +79,41 @@ void Game::solvePawnChange(){
      * 6) inicializing atributes of reborn chesspiece
      * 7) changing gamemode
     */
+
+    ChessPiece *respawnPiece ;//= resurectChessPiece();
+
+    respawnPiece->getValidMoves().clear();
+
+    if(this->gameMode == 0 && this->gameMode == 2){
+        for(int i =0; i<8;i++){
+            if(this->board->whosOnBox(0,i)==-1)
+                respawnPiece->getValidMoves().push_back(BoardPosition(0,i));
+        }
+        emit updateChessboardSignal(this->board->getChessPieceAliveBlack(), this->board->getChessPieceAliveWhite());
+        emit updateKickedPiecesSignal(this->board->getChessPieceDeadBlack(), this->board->getChessPieceDeadWhite());
+        this->gameMode = 2;
+        this->pawnChange = true;
+        return;
+
+    }else if (this->gameMode == 1 && this->gameMode == 3){
+
+        for(int i =0; i<8;i++){
+            if(this->board->whosOnBox(7,i)==-1)
+                respawnPiece->getValidMoves().push_back(BoardPosition(0,i));
+        }
+        emit updateChessboardSignal(this->board->getChessPieceAliveBlack(), this->board->getChessPieceAliveWhite());
+        emit updateKickedPiecesSignal(this->board->getChessPieceDeadBlack(), this->board->getChessPieceDeadWhite());
+        this->gameMode=3;
+        this->pawnChange = true;
+        return;
+
+
+    }
 }
 
 void Game::kickChessPieceOut(ChessPiece* toBeKicked){
     std::vector<ChessPiece*>::iterator begin;
     std::vector<ChessPiece*>::iterator end;
-    std::vector<ChessPiece*> aliveChessPieces;
-    std::vector<ChessPiece*> deadChessPieces;
 
     //If the black player is taking the white chesspiece
     if(toBeKicked->getType() >= 6){
@@ -93,17 +122,20 @@ void Game::kickChessPieceOut(ChessPiece* toBeKicked){
 
         //aliveChessPieces = this->board->getChessPieceAliveWhite();/**/
 
-        deadChessPieces = this->board->getChessPieceDeadWhite();
+        //deadChessPieces = this->board->getChessPieceDeadWhite();
         this->gameMode = 1;
-    //If the white player is taking the black chesspiece
+        this->board->getChessPieceDeadWhite().push_back(toBeKicked);
+
+        //If the white player is taking the black chesspiece
     }else if(toBeKicked->getType() < 6){
         begin = this->board->getChessPieceAliveBlack().begin();
         end = this->board->getChessPieceAliveBlack().end();
 
         //aliveChessPieces = this->board->getChessPieceAliveBlack();/**/
 
-        deadChessPieces = this->board->getChessPieceDeadBlack();
+        //deadChessPieces = this->board->getChessPieceDeadBlack();
         this->gameMode = 0;
+        this->board->getChessPieceDeadBlack().push_back(toBeKicked);
     }
 
     for(; begin != end ; begin++){
@@ -118,7 +150,7 @@ void Game::kickChessPieceOut(ChessPiece* toBeKicked){
         }
     }
 
-    deadChessPieces.push_back(toBeKicked);
+
     toBeKicked->setIsPlaced(false);
     toBeKicked->getPosition()->setX(-1);
     toBeKicked->getPosition()->setY(-1);
@@ -323,7 +355,7 @@ void Game::makeMove(ChessPiece* toBeMoved,int row,int col){
     if( typeOfChessPiece == 0 && oldX == 6){
         pawnChange = true;
     }else if(typeOfChessPiece == 6 && oldX == 1){
-    //If white pawn reached end of the chessboard
+        //If white pawn reached end of the chessboard
         pawnChange = true;
     }else{
         //if its normal move
@@ -356,8 +388,10 @@ void Game::makeMove(ChessPiece* toBeMoved,int row,int col){
     else
         startPosPawn = false;
 
-    if(pawnChange)
-        solvePawnChange();
+    if(pawnChange){
+        kickChessPieceOut(toBeMoved);
+        solvePawnChange(row,col);
+    }
 
     //Check if was moved rook, or king to cancel castling options
     updateBlackCastling(oldY, typeOfChessPiece, oldX);
@@ -393,6 +427,16 @@ void Game::computerVsComputer(){
             break;
     }
 
+}
+
+QString Game::getChesspieceToChange() const
+{
+    return chesspieceToChange;
+}
+
+void Game::setChesspieceToChange(const QString &value)
+{
+    chesspieceToChange = value;
 }
 
 bool Game::checkIfClickedValidMove(int row, int col){
@@ -471,26 +515,26 @@ void Game::solveCastling(int col, int row){
     //Inic of fen string with the part of castlings
     //check if the FEN exist, mind that 20 is totaly random ;)
     if(clickedChessPiece->getType() == 11 && row == 4 && col == 7 && this->fen.length() > 20){
-       QString FEN = this->fen.right(13);
+        QString FEN = this->fen.right(13);
 
-       //getting the part of string, where is castling info stored
-       /*on the end is everytime info of the actual turn, thats our position
+        //getting the part of string, where is castling info stored
+        /*on the end is everytime info of the actual turn, thats our position
                 //but there is exception of b3 and b6 enpassant situation      */
-       if( FEN.lastIndexOf('b') != -1 && !FEN.contains("b3") && !FEN.contains("b6"))
-           FEN = FEN.mid(FEN.lastIndexOf('b'));
-       else
-           FEN = FEN.mid(FEN.lastIndexOf('w'));
+        if( FEN.lastIndexOf('b') != -1 && !FEN.contains("b3") && !FEN.contains("b6"))
+            FEN = FEN.mid(FEN.lastIndexOf('b'));
+        else
+            FEN = FEN.mid(FEN.lastIndexOf('w'));
 
 
-       //if there is white queen side castling possible, add it to valid moves
-       if(FEN.contains('Q') && this->board->whosOnBox(7,0)== 9 && this->board->whosOnBox(7,1)==-1 && this->board->whosOnBox(7,2)==-1 && this->board->whosOnBox(7,3)==-1){
-           this->clickedChessPiece->getValidMoves().append(BoardPosition(7,2));
-       }
+        //if there is white queen side castling possible, add it to valid moves
+        if(FEN.contains('Q') && this->board->whosOnBox(7,0)== 9 && this->board->whosOnBox(7,1)==-1 && this->board->whosOnBox(7,2)==-1 && this->board->whosOnBox(7,3)==-1){
+            this->clickedChessPiece->getValidMoves().append(BoardPosition(7,2));
+        }
 
-       //if there is white king side castling possible, add it to valid moves
-       if(FEN.contains('K') && this->board->whosOnBox(7,7)== 9 && this->board->whosOnBox(7,6)==-1 && this->board->whosOnBox(7,5)==-1){
-           this->clickedChessPiece->getValidMoves().append(BoardPosition(7,6));
-       }
+        //if there is white king side castling possible, add it to valid moves
+        if(FEN.contains('K') && this->board->whosOnBox(7,7)== 9 && this->board->whosOnBox(7,6)==-1 && this->board->whosOnBox(7,5)==-1){
+            this->clickedChessPiece->getValidMoves().append(BoardPosition(7,6));
+        }
 
     }else if(clickedChessPiece->getType() == 5 && row == 4 && col == 0 && this->fen.length() > 20){
         QString FEN = this->fen.right(13);
@@ -502,7 +546,7 @@ void Game::solveCastling(int col, int row){
         else
             FEN = FEN.mid(FEN.lastIndexOf('w'));
 
-            //if there is black queen side csatling possible, add it to valid moves
+        //if there is black queen side csatling possible, add it to valid moves
         if(FEN.contains('q') && this->board->whosOnBox(0,0)== 3 && this->board->whosOnBox(0,1)==-1 && this->board->whosOnBox(0,2)==-1 && this->board->whosOnBox(0,3)==-1){
             this->clickedChessPiece->getValidMoves().append(BoardPosition(0,2));
         }
@@ -527,6 +571,23 @@ void Game::solveClick(int row, int col){
         }
     }
 
+
+    if(this->pawnChange){
+        // tu sa udeje vymena
+        /*
+        if(!this->chesspieceToChange.isEmpty() && QString::number(this->chesspieceToChange.at(this->chesspieceToChange.indexOf("i")-1))<6){
+            for(std::vector<ChessPiece*>::iterator it = this->board->getChessPieceDeadBlack().begin();it!=this->board->getChessPieceDeadBlack().end();it++){
+                if((*it)->getIconName() == chesspieceToChange){
+                    this->board->getChessPieceAliveBlack().push_back((*it));
+                    this->board->getChessPieceDeadBlack().erase(it);
+                }
+            }
+        }
+        */
+
+        this->pawnChange = false;
+        return;
+    }
 
     //If the place where i clicked whas empty box
     if (whoWasClicked == -1){
@@ -554,6 +615,7 @@ void Game::solveClick(int row, int col){
                 if(enPassant){
                     makeEnPassant(this->clickedChessPiece, row, col);
                     emit updateChessboardSignal(this->board->getChessPieceAliveBlack(), this->board->getChessPieceAliveWhite());
+                    emit updateKickedPiecesSignal(this->board->getChessPieceDeadBlack(), this->board->getChessPieceDeadWhite());
                     return;
                 }
             }
@@ -564,6 +626,7 @@ void Game::solveClick(int row, int col){
                     int gmode = this->gameMode;
                     makeCastling(row, col);
                     emit updateChessboardSignal(this->board->getChessPieceAliveBlack(), this->board->getChessPieceAliveWhite());
+                    emit updateKickedPiecesSignal(this->board->getChessPieceDeadBlack(), this->board->getChessPieceDeadWhite());
                     return;
                 }
             }
@@ -587,6 +650,7 @@ void Game::solveClick(int row, int col){
                 this->clickedChessPiece = nullptr;
                 //Redrawing the chessBoard
                 emit updateChessboardSignal(this->board->getChessPieceAliveBlack(), this->board->getChessPieceAliveWhite());
+                emit updateKickedPiecesSignal(this->board->getChessPieceDeadBlack(), this->board->getChessPieceDeadWhite());
 
                 return;
             }
@@ -634,7 +698,7 @@ void Game::solveClick(int row, int col){
             return;
         }
 
-    //Its a White Turn
+        //Its a White Turn
     }else if(this->gameMode == 1 || gameMode == 3){
 
         //if I am white and i clicked on white chesspiece which i want to move
@@ -677,8 +741,15 @@ void Game::solveClick(int row, int col){
         else{
             makeMove(this->clickedChessPiece, row, col);
             emit updateChessboardSignal(this->board->getChessPieceAliveBlack(), this->board->getChessPieceAliveWhite());
+            emit updateKickedPiecesSignal(this->board->getChessPieceDeadBlack(), this->board->getChessPieceDeadWhite());
+
         }
     }
+}
+
+void Game::deadPieceSelectedSlot(QString pieceName)
+{
+    this->chesspieceToChange = pieceName;
 }
 
 BoardPosition Game::fenNotationToBoardPostion(QString fenNot){
@@ -690,34 +761,34 @@ BoardPosition Game::fenNotationToBoardPostion(QString fenNot){
 //Generating one letter from official FEN notation, in case of empty box, it returns 1
 QChar Game::intToLetter(int chessId){
     switch(chessId){
-        case -1:
-            return '1';
-        case 0:
-            return 'p';
-        case 1:
-            return 'n';
-        case 2:
-            return 'b';
-        case 3:
-            return 'r';
-        case 4:
-            return 'q';
-        case 5:
-            return 'k';
-        case 6:
-            return 'P';
-        case 7:
-            return 'N';
-        case 8:
-            return 'B';
-        case 9:
-            return 'R';
-        case 10:
-            return 'Q';
-        case 11:
-            return 'K';
-        default:
-            return ' ';
+    case -1:
+        return '1';
+    case 0:
+        return 'p';
+    case 1:
+        return 'n';
+    case 2:
+        return 'b';
+    case 3:
+        return 'r';
+    case 4:
+        return 'q';
+    case 5:
+        return 'k';
+    case 6:
+        return 'P';
+    case 7:
+        return 'N';
+    case 8:
+        return 'B';
+    case 9:
+        return 'R';
+    case 10:
+        return 'Q';
+    case 11:
+        return 'K';
+    default:
+        return ' ';
     }
 
     return ' ';
@@ -727,40 +798,40 @@ QChar Game::intToLetter(int chessId){
 QString Game::createLetterFromRow(int pos){
 
     switch(pos){
-        case 30:
-            return(" a3");
-        case 31:
-            return(" b3");
-        case 32:
-            return(" c3");
-        case 33:
-            return( "d3");
-        case 34:
-            return(" e3");
-        case 35:
-            return(" f3");
-        case 36:
-            return(" g3");
-        case 37:
-            return(" h3");
-        case 40:
-            return(" a6");
-        case 41:
-            return(" b6");
-        case 42:
-            return(" c6");
-        case 43:
-            return(" d6");
-        case 44:
-            return(" e6");
-        case 45:
-            return(" f6");
-        case 46:
-            return(" g6");
-        case 47:
-            return(" h6");
-        }
-        return " ";
+    case 30:
+        return(" a3");
+    case 31:
+        return(" b3");
+    case 32:
+        return(" c3");
+    case 33:
+        return( "d3");
+    case 34:
+        return(" e3");
+    case 35:
+        return(" f3");
+    case 36:
+        return(" g3");
+    case 37:
+        return(" h3");
+    case 40:
+        return(" a6");
+    case 41:
+        return(" b6");
+    case 42:
+        return(" c6");
+    case 43:
+        return(" d6");
+    case 44:
+        return(" e6");
+    case 45:
+        return(" f6");
+    case 46:
+        return(" g6");
+    case 47:
+        return(" h6");
+    }
+    return " ";
 }
 
 QString Game::generateFEN(){
@@ -790,10 +861,10 @@ QString Game::generateFEN(){
                     continue;
                 }
                 emptyBoxes++;
-            //if there is any chessPiece, write it down!
+                //if there is any chessPiece, write it down!
             }else if (sign.digitValue() == -1){
                 FEN.append(sign);
-            //if there is another empty box, incerement emptyBoxes
+                //if there is another empty box, incerement emptyBoxes
             }else{
                 emptyBoxes++;
             }

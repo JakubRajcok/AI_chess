@@ -43,7 +43,7 @@ void Pawn::findValidMoves(){
             }
         }
         //is place in front free?
-        if(this->board->whosOnBox(posX+1,posY)==-1){
+        if(posX < 7 && this->board->whosOnBox(posX+1,posY)==-1){
             this->validMoves.append(BoardPosition(posX+1,posY));
         }
         //may I attack someone?
@@ -62,7 +62,7 @@ void Pawn::findValidMoves(){
             }
         }
         //is place before free?
-        if(posX>1 && this->board->whosOnBox(posX-1,posY)==-1){
+        if(posX>0 && this->board->whosOnBox(posX-1,posY)==-1){
             this->validMoves.append(BoardPosition(posX-1,posY));
         }
         //may I attack someone SZ?

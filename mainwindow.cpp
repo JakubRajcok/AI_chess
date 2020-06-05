@@ -2,7 +2,9 @@
 #include "ui_mainwindow.h"
 #include <QLabel>
 #include <QDebug>
-#include <Qpixmap>
+#include <QPixmap>
+#include <QListWidgetItem>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -15,6 +17,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&g, SIGNAL(appendLog(const QList<BoardPosition>&)),this, SLOT(appendLog(const QList<BoardPosition>&)));
     connect(&g, SIGNAL(validMoves(const QList<BoardPosition>&)),this, SLOT(drawValidMoves(const QList<BoardPosition>&)));
     connect(&g, SIGNAL(updateChessboardSignal(std::vector<ChessPiece*>,std::vector<ChessPiece*>)), this, SLOT(updateChessboardSlot(std::vector<ChessPiece*>,std::vector<ChessPiece*>)));
+    connect(&g, SIGNAL(updateKickedPiecesSignal(std::vector<ChessPiece*>,std::vector<ChessPiece*>)), this, SLOT(updateKickedPiecesSlot(std::vector<ChessPiece*>,std::vector<ChessPiece*>)));
+
     initBoard();
 }
 
@@ -90,4 +94,22 @@ void MainWindow::drawValidMoves(const QList<BoardPosition> & vm){
 
 void MainWindow::updateChessboardSlot(const std::vector<ChessPiece *> &b, const std::vector<ChessPiece *> &w){
     drawBoard(b,w);
+}
+
+void MainWindow::updateKickedPiecesSlot(const std::vector<ChessPiece *> &b, const std::vector<ChessPiece *> &w)
+{
+    ui->list_black_kickout->clear();
+    ui->list_white_kickout->clear();
+    for(ChessPiece* i : b){
+        ui->list_black_kickout->addItem(i->getIconName());
+    }
+    for(ChessPiece* i : w){
+        ui->list_white_kickout->addItem(i->getIconName());
+    }
+}
+
+
+void MainWindow::on_list_black_kickout_itemClicked(QListWidgetItem *item)
+{
+    emit deadPieceSelectedSignal(item->text());
 }
