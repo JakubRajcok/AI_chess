@@ -6,6 +6,7 @@
 #include "chessboard.h"
 #include <QChar>
 #include <QString>
+#include <QProcess>
 
 class Game : public QObject
 {
@@ -27,7 +28,7 @@ public:
     QChar intToLetter(int chessId);
 
     QString createLetterFromRow(int pos);
-    void solvePawnChange(int row, int col);
+    void solvePawnChange();
     int convertChessAnotationPos1(QChar n);
 
     void solveEnPassant(int whoWasClicked, int col, int row);
@@ -43,7 +44,10 @@ public:
     void computerVsComputer();
     QString getChesspieceToChange() const;
     void setChesspieceToChange(const QString &value);
-
+    QString getBestMove(QString , QString, QString);
+    QString translateNNFrom(QString move);
+    QString translateNNTo(QString move);
+    QString translateNNMove(QString move);
 private:
     int moveCounter;
     int halfMoveCounter=0;
@@ -58,16 +62,16 @@ private:
     QString fen;
     bool PCvsPC = true;
     bool pawnChange = false;
-    QString chesspieceToChange;
+    QString chesspieceToChange="";
 
 signals:
     void appendLog(QString s);
     void appendLog(const QList<BoardPosition>&);
+    void appendFen(QString fen);
     void validMoves(const QList<BoardPosition>&);
     void updateChessboardSignal(const std::vector<ChessPiece*> &b, const std::vector<ChessPiece*> &w);
     void updateKickedPiecesSignal(const std::vector<ChessPiece*> &b, const std::vector<ChessPiece*> &w);
 public slots:
-
     void solveClick(int,int);
     void deadPieceSelectedSlot(QString);
 };

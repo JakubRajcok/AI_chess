@@ -24,16 +24,16 @@ private:
     void initBoard();
     void drawBoard(const std::vector<ChessPiece*>&, const std::vector<ChessPiece*>& );
 signals:
-    void pohniStrelcom(int, int);
     void deadPieceSelectedSignal(QString);
+    void on_list_black_kickout_itemClicked(QListWidgetItem *item);
 private slots:
     void appendLog(QString);
     void appendLog(const QList<BoardPosition>&);
     void appendLog(int,int);
+    void appendFen(QString fen);
     void drawValidMoves(const QList<BoardPosition>&);
     void updateChessboardSlot(const std::vector<ChessPiece*> &b, const std::vector<ChessPiece*> &w);
     void updateKickedPiecesSlot(const std::vector<ChessPiece*> &b, const std::vector<ChessPiece*> &w);
 
-    void on_list_black_kickout_itemClicked(QListWidgetItem *item);
 };
 #endif // MAINWINDOW_H

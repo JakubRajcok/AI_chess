@@ -3,7 +3,9 @@
 #include "chessboard.h"
 #include "player.h"
 #include <algorithm>
-
+#include <QProcess>
+#include <QTime> // for Sleep
+#include <QCoreApplication>
 
 //white is going first
 Game::Game(QObject *parent) : QObject(parent), board{new ChessBoard}{
@@ -11,6 +13,8 @@ Game::Game(QObject *parent) : QObject(parent), board{new ChessBoard}{
     this->clickedChessPiece=nullptr;
     this->moveCounter=1;
     this->fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
+    emit appendFen(this->fen);
 
 }
 
@@ -66,48 +70,13 @@ void Game::clearingChessBoxes(int oldY, int newX, int*** brd, int oldX, int newY
     }
 }
 
-void Game::solvePawnChange(int row, int col){
-    /*Here is actually set the board to position like empty, if there was chesspiece
-     *then it was legitible kicked and moved to kickedchesspieces, it is same with
-     *our moved Pawn. It means, that now
-     * we have to:
-     * 1) move our pawn to our deadchesspieces ,DONE
-     * 2) emit signal of opening new interface with players dead chesspieces
-     * 3) choosing my prefered one //eventualy keep eye, if player can see his 1st line on chessboard
-     * 4) then player has to click on one of the free boxes (if there is not then just change gamemode)
-     * 5) redefinig vector of the new box
-     * 6) inicializing atributes of reborn chesspiece
-     * 7) changing gamemode
-    */
-
-    ChessPiece *respawnPiece ;//= resurectChessPiece();
-
-    respawnPiece->getValidMoves().clear();
-
-    if(this->gameMode == 0 && this->gameMode == 2){
-        for(int i =0; i<8;i++){
-            if(this->board->whosOnBox(0,i)==-1)
-                respawnPiece->getValidMoves().push_back(BoardPosition(0,i));
-        }
-        emit updateChessboardSignal(this->board->getChessPieceAliveBlack(), this->board->getChessPieceAliveWhite());
-        emit updateKickedPiecesSignal(this->board->getChessPieceDeadBlack(), this->board->getChessPieceDeadWhite());
+void Game::solvePawnChange(){
+    if(this->gameMode == 0 || this->gameMode == 2){
         this->gameMode = 2;
         this->pawnChange = true;
-        return;
-
-    }else if (this->gameMode == 1 && this->gameMode == 3){
-
-        for(int i =0; i<8;i++){
-            if(this->board->whosOnBox(7,i)==-1)
-                respawnPiece->getValidMoves().push_back(BoardPosition(0,i));
-        }
-        emit updateChessboardSignal(this->board->getChessPieceAliveBlack(), this->board->getChessPieceAliveWhite());
-        emit updateKickedPiecesSignal(this->board->getChessPieceDeadBlack(), this->board->getChessPieceDeadWhite());
+    }else if (this->gameMode == 1 || this->gameMode == 3){
         this->gameMode=3;
         this->pawnChange = true;
-        return;
-
-
     }
 }
 
@@ -120,9 +89,6 @@ void Game::kickChessPieceOut(ChessPiece* toBeKicked){
         begin = this->board->getChessPieceAliveWhite().begin();
         end = this->board->getChessPieceAliveWhite().end();
 
-        //aliveChessPieces = this->board->getChessPieceAliveWhite();/**/
-
-        //deadChessPieces = this->board->getChessPieceDeadWhite();
         this->gameMode = 1;
         this->board->getChessPieceDeadWhite().push_back(toBeKicked);
 
@@ -131,16 +97,12 @@ void Game::kickChessPieceOut(ChessPiece* toBeKicked){
         begin = this->board->getChessPieceAliveBlack().begin();
         end = this->board->getChessPieceAliveBlack().end();
 
-        //aliveChessPieces = this->board->getChessPieceAliveBlack();/**/
-
-        //deadChessPieces = this->board->getChessPieceDeadBlack();
         this->gameMode = 0;
         this->board->getChessPieceDeadBlack().push_back(toBeKicked);
     }
 
     for(; begin != end ; begin++){
         if(*begin == toBeKicked  ){
-            //aliveChessPieces.erase(begin);
             if(toBeKicked->getType() >= 6)
                 this->board->getChessPieceAliveWhite().erase(begin);
             else
@@ -340,7 +302,6 @@ void Game::makeMove(ChessPiece* toBeMoved,int row,int col){
     int whosOnBox = this->board->whosOnBox(row,col);
     bool pawnChange = false;
 
-
     //Setting "to" & "from" position like empty box
     clearingChessBoxes(oldY, newX, brd, oldX, newY);
 
@@ -388,24 +349,74 @@ void Game::makeMove(ChessPiece* toBeMoved,int row,int col){
     else
         startPosPawn = false;
 
-    if(pawnChange){
-        kickChessPieceOut(toBeMoved);
-        solvePawnChange(row,col);
-    }
-
     //Check if was moved rook, or king to cancel castling options
     updateBlackCastling(oldY, typeOfChessPiece, oldX);
     updateWhiteCastling(typeOfChessPiece, oldX, oldY);
 
     generateFEN();
 
+    if(pawnChange){
+        kickChessPieceOut(toBeMoved);
+        if(toBeMoved->getType() == 6)
+            this->gameMode = 1;
+        else
+            this->gameMode = 0;
+        solvePawnChange();
+    }
+
     return;
+}
+
+QString Game::translateNNFrom(QString move){
+    QString out;
+
+    if(out[1]=='1')
+        out.append('7');
+    if(out[1]=='2')
+        out.append('6');
+    if(out[1]=='3')
+        out.append('5');
+    if(out[1]=='4')
+        out.append('4');
+    if(out[1]=='5')
+        out.append('3');
+    if(out[1]=='6')
+        out.append('2');
+    if(out[1]=='7')
+        out.append('1');
+    if(out[1]=='8')
+        out.append('0');
+    out.append(convertChessAnotationPos1(move[0]));
+
+    return out;
+}
+
+QString Game::translateNNMove(QString move){
+    QString out = "";
+    out = translateNNFrom(move.left(2));
+    out.append(translateNNFrom(move.right(2)));
+
+    return out;
 }
 
 void Game::computerVsComputer(){
     bool gameover=false;
+    QString pcColor = "b";
+    QString bestMove;
+    QString firstMove = "d2d4";
 
     while(1){
+
+        if(this->gameMode==0 || this->gameMode==2)
+            pcColor = 'w';
+        else
+            pcColor = 'b';
+
+        bestMove = getBestMove(firstMove, pcColor, this->fen).left(4);
+
+        solveClick(bestMove.left(2).at(0).digitValue()  , bestMove.left(2).at(1).digitValue() );
+        solveClick(bestMove.right(2).at(0).digitValue() , bestMove.right(2).at(1).digitValue() );
+
         //White wins
         for(unsigned int i=0; i < board->getChessPieceDeadBlack().size();i++ ){
             if(board->getChessPieceDeadBlack().at(i)->getType()==5)
@@ -422,6 +433,11 @@ void Game::computerVsComputer(){
         fenNotationToBoardPostion();
         solveClick(fenNotationToBoardPostion().posx,fenNotationToBoardPostion().posy);
         */
+
+        QTime dieTime = QTime::currentTime().addMSecs( 1500 );
+        while( QTime::currentTime() < dieTime ){
+            QCoreApplication::processEvents( QEventLoop::AllEvents, 100 );
+        }
 
         if(gameover)
             break;
@@ -558,9 +574,32 @@ void Game::solveCastling(int col, int row){
     }
 }
 
+QString Game::getBestMove(QString fromToPos, QString pcColor, QString fenBeforeMove){
+
+    //inserted putty code
+    //Here I am working with tranined NN based on Python
+    QProcess p;
+    p.setWorkingDirectory("/home/jrajcok/chess_tensorflow/Predicting-Pro-Chess-Moves");
+    //p.start("python", QStringList()<< "go.py" << "b" << "d2d4" << "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    p.start("python", QStringList()<< "go.py" << pcColor << fromToPos << fenBeforeMove);
+
+    qDebug()<<p.waitForStarted();
+    qDebug()<<p.waitForFinished();
+    QByteArray ba = p.readAllStandardOutput();
+    QList<QByteArray> nn_output = ba.split('\n');
+
+    //Appending actual fen string and outputing result best move of our NN
+    emit appendLog(nn_output.at(1));
+    emit appendFen(nn_output.at(0));
+    //exit(0);
+
+
+    return QString::fromStdString(nn_output.at(1).toStdString()).append(nn_output.at(0));
+}
+
 void Game::solveClick(int row, int col){
 
-    int whoWasClicked = this->board->whosOnBox(row,col);
+    computerVsComputer();
 
     int arr[64]{};
     int k=0;
@@ -573,21 +612,64 @@ void Game::solveClick(int row, int col){
 
 
     if(this->pawnChange){
-        // tu sa udeje vymena
-        /*
-        if(!this->chesspieceToChange.isEmpty() && QString::number(this->chesspieceToChange.at(this->chesspieceToChange.indexOf("i")-1))<6){
+        /*Here is actually set the board to position like empty, if there was chesspiece
+         *then it was legitible kicked and moved to kickedchesspieces, it is same with
+         *our moved Pawn. It means, that now
+         * we have to:
+         * 1) move our pawn to our deadchesspieces ,DONE
+         * 2) emit signal of opening new interface with players dead chesspieces
+         * 3) choosing my prefered one //eventualy keep eye, if player can see his 1st line on chessboard
+         * 4) then player has to click on one of the free boxes (if there is not then just change gamemode)
+         * 5) redefinig vector of the new box
+         * 6) inicializing atributes of reborn chesspiece
+         * 7) changing gamemode
+        */
+
+        //Here we are w8ing 4 the click on kicked chesspiece to its revieve
+        if(!this->chesspieceToChange.isEmpty() && this->chesspieceToChange.at( this->chesspieceToChange.indexOf(".")-1 ).digitValue() == 0){
             for(std::vector<ChessPiece*>::iterator it = this->board->getChessPieceDeadBlack().begin();it!=this->board->getChessPieceDeadBlack().end();it++){
                 if((*it)->getIconName() == chesspieceToChange){
                     this->board->getChessPieceAliveBlack().push_back((*it));
                     this->board->getChessPieceDeadBlack().erase(it);
+
+                    for(int i =0; i<8;i++){
+                        if(this->board->whosOnBox(0,i)==-1)
+                            this->board->getChessPieceAliveBlack().back()->getValidMoves().push_back(BoardPosition(0,i));
+                    }
+                    emit updateChessboardSignal(this->board->getChessPieceAliveBlack(), this->board->getChessPieceAliveWhite());
+                    emit updateKickedPiecesSignal(this->board->getChessPieceDeadBlack(), this->board->getChessPieceDeadWhite());
+
+                    this->pawnChange = false;
+                    this->chesspieceToChange = "";
+                    break;
+                }
+            }
+        }else if(!this->chesspieceToChange.isEmpty() && this->chesspieceToChange.at( this->chesspieceToChange.indexOf(".")-1 ).digitValue() == 1){
+            for(std::vector<ChessPiece*>::iterator it = this->board->getChessPieceDeadWhite().begin();it!=this->board->getChessPieceDeadWhite().end();it++){
+                if((*it)->getIconName() == chesspieceToChange){
+                    this->board->getChessPieceAliveWhite().push_back((*it));
+                    this->board->getChessPieceDeadWhite().erase(it);
+
+                    for(int i =0; i<8;i++){
+                        if(this->board->whosOnBox(7,i)==-1)
+                            this->board->getChessPieceAliveWhite().back()->getValidMoves().push_back(BoardPosition(7,i));
+                    }
+                    emit updateChessboardSignal(this->board->getChessPieceAliveBlack(), this->board->getChessPieceAliveWhite());
+                    emit updateKickedPiecesSignal(this->board->getChessPieceDeadBlack(), this->board->getChessPieceDeadWhite());
+
+                    this->pawnChange = false;
+                    this->chesspieceToChange = "";
+                    break;
                 }
             }
         }
-        */
-
-        this->pawnChange = false;
+        //este ju musis polozit
+        //aktualizovat jej suradnice a premenne
+        //a dalej len zmenit gamemode
         return;
     }
+
+    int whoWasClicked = this->board->whosOnBox(row,col);
 
     //If the place where i clicked whas empty box
     if (whoWasClicked == -1){
@@ -598,21 +680,28 @@ void Game::solveClick(int row, int col){
             if( (clickedChessPiece->getType() == 0 ) || (clickedChessPiece->getType() == 6)){
                 bool enPassant = false;
 
-                //if got peasant min one move, if its not ours, then check for another possible
+                //if got min one move, if its not ours, then check for another possible
                 if(clickedChessPiece->getValidMoves().size() > 0){
                     int oldY = clickedChessPiece->getPosition()->getY();
                     int newY = clickedChessPiece->getValidMoves().at(0).getY();
+
                     if( oldY != newY && this->board->whosOnBox(clickedChessPiece->getValidMoves().at(0).getX(),newY) == -1 )
                         enPassant = true;
-                    else if(clickedChessPiece->getValidMoves().size() > 1){
+                    else if(clickedChessPiece->getValidMoves().size() == 2){
                         oldY = clickedChessPiece->getPosition()->getY();
                         newY = clickedChessPiece->getValidMoves().at(1).getY();
                         if( oldY != newY && this->board->whosOnBox(clickedChessPiece->getValidMoves().at(1).getX(),newY) == -1)
                             enPassant = true;
+                    }else if(clickedChessPiece->getValidMoves().size() > 2){
+                        oldY = clickedChessPiece->getPosition()->getY();
+                        newY = clickedChessPiece->getValidMoves().at(2).getY();
+                        if( oldY != newY && this->board->whosOnBox(clickedChessPiece->getValidMoves().at(2).getX(),newY) == -1)
+                            enPassant = true;
                     }
                 }
+
                 //Checking if I click valid move from choices, if yes then making move
-                if(enPassant){
+                if(enPassant && ( (row == 5 && this->board->whosOnBox(row-1,col) == 6) || (row == 2 && this->board->whosOnBox(row+1,col) == 0) ) ){
                     makeEnPassant(this->clickedChessPiece, row, col);
                     emit updateChessboardSignal(this->board->getChessPieceAliveBlack(), this->board->getChessPieceAliveWhite());
                     emit updateKickedPiecesSignal(this->board->getChessPieceDeadBlack(), this->board->getChessPieceDeadWhite());
@@ -623,7 +712,6 @@ void Game::solveClick(int row, int col){
             //The king was clicked and now is player looking for empty boxes/castling
             if( (clickedChessPiece->getType() == 5 ) || (clickedChessPiece->getType() == 11)){
                 if( (row ==0 && col ==2 ) || (row ==0 && col ==6) || (row ==7 && col ==2) || (row ==7 && col ==6) ){
-                    int gmode = this->gameMode;
                     makeCastling(row, col);
                     emit updateChessboardSignal(this->board->getChessPieceAliveBlack(), this->board->getChessPieceAliveWhite());
                     emit updateKickedPiecesSignal(this->board->getChessPieceDeadBlack(), this->board->getChessPieceDeadWhite());
@@ -663,7 +751,6 @@ void Game::solveClick(int row, int col){
     if( (gameMode == 0 && whoWasClicked>=6) || (gameMode == 1 && whoWasClicked<6) ){
         return;
     }
-
 
     //Its a Black turn
     if(this->gameMode == 0 || gameMode == 2){
@@ -720,7 +807,7 @@ void Game::solveClick(int row, int col){
             //If i clicked corectly and there are valid moves
             //Inicialization of clicked chesspiese and changing the gameMode
             this->gameMode = this->gameMode+2;
-            emit validMoves(this->clickedChessPiece->getValidMoves());/*CRAAAAAAAAAAASHSHSAHAHAHA po vela tahoch je problem s pesiakom*/
+            emit validMoves(this->clickedChessPiece->getValidMoves());
             return;
         }
 
@@ -747,8 +834,7 @@ void Game::solveClick(int row, int col){
     }
 }
 
-void Game::deadPieceSelectedSlot(QString pieceName)
-{
+void Game::deadPieceSelectedSlot(QString pieceName){
     this->chesspieceToChange = pieceName;
 }
 
@@ -913,5 +999,6 @@ QString Game::generateFEN(){
     FEN.append( QString::number ((int)moveCounter) );
 
     this->fen = FEN;
+    emit appendFen(this->fen);
     return FEN;
 }

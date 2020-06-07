@@ -16,9 +16,27 @@ MainWindow::MainWindow(QWidget *parent)
     //Signal for writeing to our log, including ovveriding of in params
     connect(this->ui->tableWidget, SIGNAL(cellClicked(int,int)),this, SLOT(appendLog(int,int)));
     connect(&g, SIGNAL(appendLog(const QList<BoardPosition>&)),this, SLOT(appendLog(const QList<BoardPosition>&)));
+    connect(&g, SIGNAL(appendLog(QString)),this, SLOT(appendLog(QString)));
+    connect(&g, SIGNAL(appendFen(QString)),this, SLOT(appendFen(QString)));
     connect(&g, SIGNAL(validMoves(const QList<BoardPosition>&)),this, SLOT(drawValidMoves(const QList<BoardPosition>&)));
     connect(&g, SIGNAL(updateChessboardSignal(std::vector<ChessPiece*>,std::vector<ChessPiece*>)), this, SLOT(updateChessboardSlot(std::vector<ChessPiece*>,std::vector<ChessPiece*>)));
     connect(&g, SIGNAL(updateKickedPiecesSignal(std::vector<ChessPiece*>,std::vector<ChessPiece*>)), this, SLOT(updateKickedPiecesSlot(std::vector<ChessPiece*>,std::vector<ChessPiece*>)));
+    /*
+    //inserted putty code
+    QProcess p;
+    p.setWorkingDirectory("/home/jrajcok/chess_tensorflow/Predicting-Pro-Chess-Moves");
+    p.start("python", QStringList()<< "go.py" << "b" << "d2d4" << "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    //p.start( "ls" );
+    //p.start("python", QStringList() << "-V");
+    qDebug()<<p.waitForStarted();
+    qDebug()<<p.waitForFinished();
+    QByteArray ba = p.readAllStandardOutput();
+    QList<QByteArray> nn_output = ba.split('\n');
+    ui->lineEdit->setText(nn_output.at(0));
+    ui->log->append(nn_output.at(1));
+    //qDebug() << ba;
+    //exit(0);
+    */
 
     initBoard();
 }
@@ -73,7 +91,7 @@ void MainWindow::drawBoard(const std::vector<ChessPiece*> &b, const std::vector<
     }
 }
 
-void MainWindow::appendLog(const QString s){
+void MainWindow::appendLog(QString s){
     ui->log->append(s);
 }
 
@@ -85,6 +103,10 @@ void MainWindow::appendLog(const QList<BoardPosition> & validMoves){
 
 void MainWindow::appendLog(int row, int col){
     ui->log->append(QString::number(row) + " " + QString::number(col) + "Gamemode: " + QString::number(this->g.gameMode) );
+}
+
+void MainWindow::appendFen(QString fen){
+    ui->lineEdit->setText(fen);
 }
 
 void MainWindow::drawValidMoves(const QList<BoardPosition> & vm){
@@ -110,7 +132,4 @@ void MainWindow::updateKickedPiecesSlot(const std::vector<ChessPiece *> &b, cons
 }
 
 
-void MainWindow::on_list_black_kickout_itemClicked(QListWidgetItem *item)
-{
-    emit deadPieceSelectedSignal(item->text());
-}
+

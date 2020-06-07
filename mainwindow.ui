@@ -240,14 +240,14 @@
          <item>
           <widget class="QPushButton" name="pushButton">
            <property name="text">
-            <string>PushButton</string>
+            <string>Import</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QPushButton" name="pushButton_2">
            <property name="text">
-            <string>PushButton</string>
+            <string>Export</string>
            </property>
           </widget>
          </item>
@@ -264,11 +264,35 @@
      <x>0</x>
      <y>0</y>
      <width>1096</width>
-     <height>20</height>
+     <height>25</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuHuman_vs_Human">
+    <property name="title">
+     <string>Gamemode</string>
+    </property>
+    <addaction name="actionHuman_vs_Human"/>
+    <addaction name="actionHuman_vs_PC"/>
+    <addaction name="actionPC_vs_PC"/>
+   </widget>
+   <addaction name="menuHuman_vs_Human"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionHuman_vs_Human">
+   <property name="text">
+    <string>Human vs Human</string>
+   </property>
+  </action>
+  <action name="actionHuman_vs_PC">
+   <property name="text">
+    <string>Human vs PC</string>
+   </property>
+  </action>
+  <action name="actionPC_vs_PC">
+   <property name="text">
+    <string>PC vs PC</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>
