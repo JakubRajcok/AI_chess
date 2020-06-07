@@ -45,9 +45,7 @@ public:
     QString getChesspieceToChange() const;
     void setChesspieceToChange(const QString &value);
     QString getBestMove(QString , QString, QString);
-    QString translateNNFrom(QString move);
-    QString translateNNTo(QString move);
-    QString translateNNMove(QString move);
+    QString giveMePos(QString);
 private:
     int moveCounter;
     int halfMoveCounter=0;

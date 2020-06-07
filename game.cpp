@@ -367,55 +367,188 @@ void Game::makeMove(ChessPiece* toBeMoved,int row,int col){
     return;
 }
 
-QString Game::translateNNFrom(QString move){
-    QString out;
+QString Game::giveMePos(QString in){
+    if(in == "a1")
+        return "70";
+    if(in == "b1")
+        return "71";
+    if(in == "c1")
+        return "72";
+    if(in == "d1")
+        return "73";
+    if(in == "e1")
+        return "74";
+    if(in == "f1")
+        return "75";
+    if(in == "g1")
+        return "76";
+    if(in == "h1")
+        return "77";
 
-    if(out[1]=='1')
-        out.append('7');
-    if(out[1]=='2')
-        out.append('6');
-    if(out[1]=='3')
-        out.append('5');
-    if(out[1]=='4')
-        out.append('4');
-    if(out[1]=='5')
-        out.append('3');
-    if(out[1]=='6')
-        out.append('2');
-    if(out[1]=='7')
-        out.append('1');
-    if(out[1]=='8')
-        out.append('0');
-    out.append(convertChessAnotationPos1(move[0]));
+    if(in == "a2")
+        return "60";
+    if(in == "b2")
+        return "61";
+    if(in == "c2")
+        return "62";
+    if(in == "d2")
+        return "63";
+    if(in == "e2")
+        return "64";
+    if(in == "f2")
+        return "65";
+    if(in == "g2")
+        return "66";
+    if(in == "h2")
+        return "67";
 
-    return out;
-}
+    if(in == "a3")
+        return "50";
+    if(in == "b3")
+        return "51";
+    if(in == "c3")
+        return "52";
+    if(in == "d3")
+        return "53";
+    if(in == "e3")
+        return "54";
+    if(in == "f3")
+        return "55";
+    if(in == "g3")
+        return "56";
+    if(in == "h3")
+        return "57";
 
-QString Game::translateNNMove(QString move){
-    QString out = "";
-    out = translateNNFrom(move.left(2));
-    out.append(translateNNFrom(move.right(2)));
+    if(in == "a4")
+        return "40";
+    if(in == "b4")
+        return "41";
+    if(in == "c4")
+        return "42";
+    if(in == "d4")
+        return "43";
+    if(in == "e4")
+        return "44";
+    if(in == "f4")
+        return "45";
+    if(in == "g4")
+        return "46";
+    if(in == "h4")
+        return "47";
 
-    return out;
+    if(in == "a5")
+        return "30";
+    if(in == "b5")
+        return "31";
+    if(in == "c5")
+        return "32";
+    if(in == "d5")
+        return "33";
+    if(in == "e5")
+        return "34";
+    if(in == "f5")
+        return "35";
+    if(in == "g5")
+        return "36";
+    if(in == "h5")
+        return "37";
+
+    if(in == "a6")
+        return "20";
+    if(in == "b6")
+        return "21";
+    if(in == "c6")
+        return "22";
+    if(in == "d6")
+        return "23";
+    if(in == "e6")
+        return "24";
+    if(in == "f6")
+        return "25";
+    if(in == "g6")
+        return "26";
+    if(in == "h6")
+        return "27";
+
+    if(in == "a7")
+        return "10";
+    if(in == "b7")
+        return "11";
+    if(in == "c7")
+        return "12";
+    if(in == "d7")
+        return "13";
+    if(in == "e7")
+        return "14";
+    if(in == "f7")
+        return "15";
+    if(in == "g7")
+        return "16";
+    if(in == "h7")
+        return "17";
+
+    if(in == "a8")
+        return "00";
+    if(in == "b8")
+        return "01";
+    if(in == "c8")
+        return "02";
+    if(in == "d8")
+        return "03";
+    if(in == "e8")
+        return "04";
+    if(in == "f8")
+        return "05";
+    if(in == "g8")
+        return "06";
+    if(in == "h8")
+        return "07";
+
+    return " ";
 }
 
 void Game::computerVsComputer(){
     bool gameover=false;
-    QString pcColor = "b";
-    QString bestMove;
-    QString firstMove = "d2d4";
+    QString pcColor = "w";
+    QString lastMove = "d2d4";
+    QString fenBefore = this->fen;
+
+    //d2 d4
+    /////////pomimo d7 d5
+    //63 43
+
+    solveClick(giveMePos(lastMove).at(0).digitValue() ,giveMePos(lastMove).at(1).digitValue() );
+    solveClick(giveMePos(lastMove).at(2).digitValue() ,giveMePos(lastMove).at(3).digitValue() );
+
+    /*
+    farba sa nastavi na bielu
+    do *lastmove* si zapamatame tah
+    zapamatame si fen
+
+    vykoname tah z      solveClick(giveMePos(lastMove).at(0) ,giveMePos(lastMove).at(1) );
+    vykoname tah na     solveClick(giveMePos(lastMove).at(2) ,giveMePos(lastMove).at(3) );
+
+    farba sa otoci
+    do *lastmove* posleme *lastMove* *pcColor* *fenBefore*
+    do *fenBefore* nastavime aktualnu fen
+
+    vykoname tah z      solveClick(giveMePos(lastMove).at(0) ,giveMePos(lastMove).at(1) );
+    vykoname tah na     solveClick(giveMePos(lastMove).at(2) ,giveMePos(lastMove).at(3) );
+
+    skontrolujeme sach
+    */
 
     while(1){
 
-        if(this->gameMode==0 || this->gameMode==2)
-            pcColor = 'w';
+        if(pcColor == "w")
+            pcColor = "b";
         else
-            pcColor = 'b';
+            pcColor = "w";
 
-        bestMove = getBestMove(firstMove, pcColor, this->fen).left(4);
+        lastMove = getBestMove(lastMove, pcColor, fenBefore).left(4);
 
-        solveClick(bestMove.left(2).at(0).digitValue()  , bestMove.left(2).at(1).digitValue() );
-        solveClick(bestMove.right(2).at(0).digitValue() , bestMove.right(2).at(1).digitValue() );
+        solveClick(giveMePos(lastMove).at(0).digitValue() ,giveMePos(lastMove).at(1).digitValue() );
+        solveClick(giveMePos(lastMove).at(2).digitValue() ,giveMePos(lastMove).at(3).digitValue() );
 
         //White wins
         for(unsigned int i=0; i < board->getChessPieceDeadBlack().size();i++ ){
@@ -427,12 +560,6 @@ void Game::computerVsComputer(){
             if(board->getChessPieceDeadWhite().at(i)->getType()==11)
                 gameover=true;
         }
-
-        /*
-        engineGetMove(this.fen);
-        fenNotationToBoardPostion();
-        solveClick(fenNotationToBoardPostion().posx,fenNotationToBoardPostion().posy);
-        */
 
         QTime dieTime = QTime::currentTime().addMSecs( 1500 );
         while( QTime::currentTime() < dieTime ){
@@ -599,7 +726,7 @@ QString Game::getBestMove(QString fromToPos, QString pcColor, QString fenBeforeM
 
 void Game::solveClick(int row, int col){
 
-    computerVsComputer();
+    //computerVsComputer();///////////////////////////////////////////////
 
     int arr[64]{};
     int k=0;

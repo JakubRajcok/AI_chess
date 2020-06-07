@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&g, SIGNAL(validMoves(const QList<BoardPosition>&)),this, SLOT(drawValidMoves(const QList<BoardPosition>&)));
     connect(&g, SIGNAL(updateChessboardSignal(std::vector<ChessPiece*>,std::vector<ChessPiece*>)), this, SLOT(updateChessboardSlot(std::vector<ChessPiece*>,std::vector<ChessPiece*>)));
     connect(&g, SIGNAL(updateKickedPiecesSignal(std::vector<ChessPiece*>,std::vector<ChessPiece*>)), this, SLOT(updateKickedPiecesSlot(std::vector<ChessPiece*>,std::vector<ChessPiece*>)));
+    connect(this, SIGNAL(deadPieceSelectedSignal(QString)), &g, SLOT(deadPieceSelectedSlot(QString)));
     /*
     //inserted putty code
     QProcess p;
@@ -132,4 +133,21 @@ void MainWindow::updateKickedPiecesSlot(const std::vector<ChessPiece *> &b, cons
 }
 
 
+void MainWindow::on_list_white_kickout_itemClicked(QListWidgetItem *item)
+{
+    emit deadPieceSelectedSignal(item->text());
+}
 
+void MainWindow::on_list_black_kickout_itemClicked(QListWidgetItem *item)
+{
+    emit deadPieceSelectedSignal(item->text());
+}
+
+
+
+
+
+void MainWindow::on_pushButton_clicked()
+{
+    this->g.computerVsComputer();
+}
