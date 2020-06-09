@@ -520,23 +520,7 @@ void Game::computerVsComputer(){
     solveClick(giveMePos(lastMove).at(0).digitValue() ,giveMePos(lastMove).at(1).digitValue() );
     solveClick(giveMePos(lastMove).at(2).digitValue() ,giveMePos(lastMove).at(3).digitValue() );
 
-    /*
-    farba sa nastavi na bielu
-    do *lastmove* si zapamatame tah
-    zapamatame si fen
 
-    vykoname tah z      solveClick(giveMePos(lastMove).at(0) ,giveMePos(lastMove).at(1) );
-    vykoname tah na     solveClick(giveMePos(lastMove).at(2) ,giveMePos(lastMove).at(3) );
-
-    farba sa otoci
-    do *lastmove* posleme *lastMove* *pcColor* *fenBefore*
-    do *fenBefore* nastavime aktualnu fen
-
-    vykoname tah z      solveClick(giveMePos(lastMove).at(0) ,giveMePos(lastMove).at(1) );
-    vykoname tah na     solveClick(giveMePos(lastMove).at(2) ,giveMePos(lastMove).at(3) );
-
-    skontrolujeme sach
-    */
 
     while(1){
 
@@ -545,10 +529,23 @@ void Game::computerVsComputer(){
         else
             pcColor = "w";
 
-        lastMove = getBestMove(lastMove, pcColor, fenBefore).left(4);
+        QString fenFromBestMove = getBestMove(lastMove, pcColor, fenBefore).left(4).remove(0, 2);
+        lastMove = getBestMove(lastMove, pcColor, fenBefore).left(4);   // move made based on actual chessboard
+        QString fenBefore = this->fen;                                  // actual chessboard before fen
+
+
+        qDebug() << " ";
+        qDebug() << "Situation before executing latest move";
+        qDebug() << "FEN before the move: "<< fenBefore;
+        qDebug() << "Last made move: "<<lastMove;
+        qDebug() << "Color of PC: " << pcColor;
 
         solveClick(giveMePos(lastMove).at(0).digitValue() ,giveMePos(lastMove).at(1).digitValue() );
         solveClick(giveMePos(lastMove).at(2).digitValue() ,giveMePos(lastMove).at(3).digitValue() );
+
+        qDebug() << "----------------------------------------";
+        qDebug() << "FEN from the best move: " << fenFromBestMove;
+        qDebug() << "The FEN game generated: " << this->fen;
 
         //White wins
         for(unsigned int i=0; i < board->getChessPieceDeadBlack().size();i++ ){
@@ -561,7 +558,7 @@ void Game::computerVsComputer(){
                 gameover=true;
         }
 
-        QTime dieTime = QTime::currentTime().addMSecs( 1500 );
+        QTime dieTime = QTime::currentTime().addMSecs( 500 );
         while( QTime::currentTime() < dieTime ){
             QCoreApplication::processEvents( QEventLoop::AllEvents, 100 );
         }
@@ -571,6 +568,24 @@ void Game::computerVsComputer(){
     }
 
 }
+
+/*
+farba sa nastavi na bielu
+do *lastmove* si zapamatame tah
+zapamatame si fen
+
+vykoname tah z      solveClick(giveMePos(lastMove).at(0) ,giveMePos(lastMove).at(1) );
+vykoname tah na     solveClick(giveMePos(lastMove).at(2) ,giveMePos(lastMove).at(3) );
+
+farba sa otoci
+do *lastmove* posleme *lastMove* *pcColor* *fenBefore*
+do *fenBefore* nastavime aktualnu fen
+
+vykoname tah z      solveClick(giveMePos(lastMove).at(0) ,giveMePos(lastMove).at(1) );
+vykoname tah na     solveClick(giveMePos(lastMove).at(2) ,giveMePos(lastMove).at(3) );
+
+skontrolujeme sach
+*/
 
 QString Game::getChesspieceToChange() const
 {
@@ -710,8 +725,6 @@ QString Game::getBestMove(QString fromToPos, QString pcColor, QString fenBeforeM
     //p.start("python", QStringList()<< "go.py" << "b" << "d2d4" << "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     p.start("python", QStringList()<< "go.py" << pcColor << fromToPos << fenBeforeMove);
 
-    qDebug()<<p.waitForStarted();
-    qDebug()<<p.waitForFinished();
     QByteArray ba = p.readAllStandardOutput();
     QList<QByteArray> nn_output = ba.split('\n');
 
@@ -725,7 +738,7 @@ QString Game::getBestMove(QString fromToPos, QString pcColor, QString fenBeforeM
 }
 
 void Game::solveClick(int row, int col){
-
+    qDebug()<<"Clicked (row,col) in gamemode: ("<<row<<","<<col<<") in gm: "<<this->gameMode;
     //computerVsComputer();///////////////////////////////////////////////
 
     int arr[64]{};
