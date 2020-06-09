@@ -522,7 +522,7 @@ void Game::computerVsComputer(){
 
     int i=1;
     while(1){
-        qDebug() << "----------------------------------------";
+        qDebug() << " ";
         qDebug() << "Tah "<<i;
         if(pcColor == "w")
             pcColor = "b";
