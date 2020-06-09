@@ -511,13 +511,13 @@ void Game::computerVsComputer(){
     bool gameover=false;
     QString pcColor = "w";
     QString lastMove = "d2d4";
-    QString fenBefore = this->fen;
+    QString fenBefore = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
     //d2 d4
     /////////pomimo d7 d5
     //63 43
 
-    solveClick(giveMePos(lastMove.left(2)).at(0).digitValue() , giveMePos(lastMove.left(2)).at(1).digitValue() );
+    solveClick(giveMePos(lastMove.left(2)).at(0).digitValue() ,giveMePos(lastMove.left(2)).at(1).digitValue() );
     solveClick(giveMePos(lastMove.right(2)).at(0).digitValue() ,giveMePos(lastMove.right(2)).at(1).digitValue() );
 
     int i=1;
@@ -529,6 +529,8 @@ void Game::computerVsComputer(){
         else
             pcColor = "w";
 
+
+        qDebug()<<"FEN to get best move: "<<fenBefore<<" lastmove: "<< lastMove<< " pcColor: "<<pcColor;
         QString fenFromBestMove = getBestMove(lastMove, pcColor, fenBefore).left(4).remove(0, 2);
         lastMove = getBestMove(lastMove, pcColor, fenBefore).left(4);   // move made based on actual chessboard
         fenBefore = this->fen;                                  // actual chessboard before fen
