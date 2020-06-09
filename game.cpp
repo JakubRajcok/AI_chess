@@ -1077,7 +1077,10 @@ QString Game::generateFEN(){
             //do I have chesspiece or empty box?
             if( emptyBoxes != 0 ){
                 //am I on the end of embeded for?
-                if(j == 7){
+                if(j == 7 && sign != -1){
+                    FEN.append(QString::number(emptyBoxes));
+                    FEN.append(sign);
+                }else if (j==7){
                     //then write string, because the for is ending
                     FEN.append( QString::number(++emptyBoxes) );
                     emptyBoxes = 0;
@@ -1090,10 +1093,10 @@ QString Game::generateFEN(){
                     continue;
                 }
                 emptyBoxes++;
-                //if there is any chessPiece, write it down!
+            //if there is any chessPiece, write it down!
             }else if (sign.digitValue() == -1){
                 FEN.append(sign);
-                //if there is another empty box, incerement emptyBoxes
+            //if there is another empty box, incerement emptyBoxes
             }else{
                 emptyBoxes++;
             }
