@@ -517,10 +517,8 @@ void Game::computerVsComputer(){
     /////////pomimo d7 d5
     //63 43
 
-    solveClick(giveMePos(lastMove).at(0).digitValue() ,giveMePos(lastMove).at(1).digitValue() );
-    solveClick(giveMePos(lastMove).at(2).digitValue() ,giveMePos(lastMove).at(3).digitValue() );
-
-
+    solveClick(giveMePos(lastMove.left(2)).at(0).digitValue() , giveMePos(lastMove.left(2)).at(1).digitValue() );
+    solveClick(giveMePos(lastMove.right(2)).at(0).digitValue() ,giveMePos(lastMove.right(2)).at(1).digitValue() );
 
     while(1){
 
@@ -540,8 +538,8 @@ void Game::computerVsComputer(){
         qDebug() << "Last made move: "<<lastMove;
         qDebug() << "Color of PC: " << pcColor;
 
-        solveClick(giveMePos(lastMove).at(0).digitValue() ,giveMePos(lastMove).at(1).digitValue() );
-        solveClick(giveMePos(lastMove).at(2).digitValue() ,giveMePos(lastMove).at(3).digitValue() );
+        solveClick(giveMePos(lastMove.left(2)).at(0).digitValue() , giveMePos(lastMove.left(2)).at(1).digitValue() );
+        solveClick(giveMePos(lastMove.right(2)).at(0).digitValue() ,giveMePos(lastMove.right(2)).at(1).digitValue() );
 
         qDebug() << "----------------------------------------";
         qDebug() << "FEN from the best move: " << fenFromBestMove;
