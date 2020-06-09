@@ -520,8 +520,10 @@ void Game::computerVsComputer(){
     solveClick(giveMePos(lastMove.left(2)).at(0).digitValue() , giveMePos(lastMove.left(2)).at(1).digitValue() );
     solveClick(giveMePos(lastMove.right(2)).at(0).digitValue() ,giveMePos(lastMove.right(2)).at(1).digitValue() );
 
+    int i=1;
     while(1){
-
+        qDebug() << " ";
+        qDebug() << "Tah "<<i;
         if(pcColor == "w")
             pcColor = "b";
         else
@@ -529,11 +531,9 @@ void Game::computerVsComputer(){
 
         QString fenFromBestMove = getBestMove(lastMove, pcColor, fenBefore).left(4).remove(0, 2);
         lastMove = getBestMove(lastMove, pcColor, fenBefore).left(4);   // move made based on actual chessboard
-        QString fenBefore = this->fen;                                  // actual chessboard before fen
+        fenBefore = this->fen;                                  // actual chessboard before fen
 
 
-        qDebug() << " ";
-        qDebug() << "Situation before executing latest move";
         qDebug() << "FEN before the move: "<< fenBefore;
         qDebug() << "Last made move: "<<lastMove;
         qDebug() << "Color of PC: " << pcColor;
@@ -563,6 +563,7 @@ void Game::computerVsComputer(){
 
         if(gameover)
             break;
+        i++;
     }
 
 }
@@ -737,7 +738,7 @@ QString Game::getBestMove(QString fromToPos, QString pcColor, QString fenBeforeM
 
 void Game::solveClick(int row, int col){
     qDebug()<<"Clicked (row,col) in gamemode: ("<<row<<","<<col<<") in gm: "<<this->gameMode;
-    //computerVsComputer();///////////////////////////////////////////////
+
 
     int arr[64]{};
     int k=0;
