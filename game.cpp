@@ -724,6 +724,9 @@ QString Game::getBestMove(QString fromToPos, QString pcColor, QString fenBeforeM
     //p.start("python", QStringList()<< "go.py" << "b" << "d2d4" << "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     p.start("python", QStringList()<< "go.py" << pcColor << fromToPos << fenBeforeMove);
 
+    p.waitForStarted();
+    //qDebug()<<p.waitForFinished();
+
     QByteArray ba = p.readAllStandardOutput();
     QList<QByteArray> nn_output = ba.split('\n');
 
