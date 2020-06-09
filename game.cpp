@@ -529,7 +529,7 @@ void Game::computerVsComputer(){
         else
             pcColor = "w";
 
-        QString fenFromBestMove = getBestMove(lastMove, pcColor, fenBefore).left(4).remove(0, 2);
+        QString fenFromBestMove = getBestMove(lastMove, pcColor, fenBefore).remove(0, 2);
         lastMove = getBestMove(lastMove, pcColor, fenBefore).left(4);   // move made based on actual chessboard
         fenBefore = this->fen;                                  // actual chessboard before fen
 
