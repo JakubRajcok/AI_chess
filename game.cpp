@@ -522,15 +522,13 @@ void Game::computerVsComputer(){
 
     int i=1;
     while(1){
-        qDebug() << " ";
+        qDebug() << "----------------------------------------";
         qDebug() << "Tah "<<i;
         if(pcColor == "w")
             pcColor = "b";
         else
             pcColor = "w";
 
-
-        qDebug()<<"FEN to get best move: "<<fenBefore<<" lastmove: "<< lastMove<< " pcColor: "<<pcColor;
         QString fenFromBestMove = getBestMove(lastMove, pcColor, fenBefore).left(4).remove(0, 2);
         lastMove = getBestMove(lastMove, pcColor, fenBefore).left(4);   // move made based on actual chessboard
         fenBefore = this->fen;                                  // actual chessboard before fen
@@ -727,8 +725,8 @@ QString Game::getBestMove(QString fromToPos, QString pcColor, QString fenBeforeM
     //p.start("python", QStringList()<< "go.py" << "b" << "d2d4" << "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     p.start("python", QStringList()<< "go.py" << pcColor << fromToPos << fenBeforeMove);
 
-    qDebug() << p.waitForStarted();
-    qDebug() << p.waitForFinished();
+    p.waitForStarted();
+    p.waitForFinished();
 
     QByteArray ba = p.readAllStandardOutput();
     QList<QByteArray> nn_output = ba.split('\n');
