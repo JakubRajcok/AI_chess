@@ -507,10 +507,23 @@ QString Game::giveMePos(QString in){
     return " ";
 }
 
+QString Game::humanVsComputer(QString lastMove, QString fenBeforeMove){
+    QString pcColor = "b";
+    //= "b1c3";//"d2d4"
+    QString fenBefore=fenBeforeMove; // = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
+    QString fenFromBestMove = getBestMove(lastMove, pcColor, fenBefore).remove(0, 4);
+    lastMove = getBestMove(lastMove, pcColor, fenBefore).left(4);   // move made based on actual chessboard
+
+    solveClick(giveMePos(lastMove.left(2)).at(0).digitValue() , giveMePos(lastMove.left(2)).at(1).digitValue() );
+    solveClick(giveMePos(lastMove.right(2)).at(0).digitValue() ,giveMePos(lastMove.right(2)).at(1).digitValue() );
+
+}
+
 void Game::computerVsComputer(){
     bool gameover=false;
     QString pcColor = "w";
-    QString lastMove = "d2d4";
+    QString lastMove = "b1c3";//"d2d4"
     QString fenBefore = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
     //d2 d4
@@ -524,10 +537,15 @@ void Game::computerVsComputer(){
     while(1){
         qDebug() << " ";
         qDebug() << "Tah "<<i;
-        if(pcColor == "w")
+        if(pcColor == "w"){
             pcColor = "b";
-        else
+            
+        }
+        else{
             pcColor = "w";
+            
+        }
+        
 
         QString fenFromBestMove = getBestMove(lastMove, pcColor, fenBefore).remove(0, 4);
         lastMove = getBestMove(lastMove, pcColor, fenBefore).left(4);   // move made based on actual chessboard
@@ -717,6 +735,7 @@ void Game::solveCastling(int col, int row){
 
 QString Game::getBestMove(QString fromToPos, QString pcColor, QString fenBeforeMove){
 
+	//qDebug()<<fromToPos<<" "<<pcColor <<" "<<fenBeforeMove;
 
     //inserted putty code
     //Here I am working with tranined NN based on Python
@@ -743,7 +762,7 @@ QString Game::getBestMove(QString fromToPos, QString pcColor, QString fenBeforeM
 void Game::solveClick(int row, int col){
     qDebug()<<"Clicked (row,col) in gamemode: ("<<row<<","<<col<<") in gm: "<<this->gameMode;
 
-
+    /*
     int arr[64]{};
     int k=0;
     for( int i=0;i<8;i++){
@@ -751,6 +770,11 @@ void Game::solveClick(int row, int col){
             arr[k]= this->board->whosOnBox(i,j);
             k++;
         }
+    }
+    */
+
+    if(this->humanVsComputerB && this->gameMode == 0){
+        humanVsComputer( giveMePos(this->lastMadeMove),this->fen);
     }
 
 
@@ -1034,7 +1058,7 @@ QString Game::createLetterFromRow(int pos){
     case 32:
         return(" c3");
     case 33:
-        return( "d3");
+        return(" d3");
     case 34:
         return(" e3");
     case 35:

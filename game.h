@@ -17,6 +17,7 @@ public:
     int getGameMode();
     void setGameMode(int i);
     ChessBoard *getBoard() const;
+    QString lastMadeMove;
     void setBoard(ChessBoard *value);
     void makeMove(ChessPiece* toByMoved,int row,int col);
     void clearingChessBoxes(int oldY, int newX, int*** brd, int oldX, int newY);
@@ -46,6 +47,8 @@ public:
     void setChesspieceToChange(const QString &value);
     QString getBestMove(QString , QString, QString);
     QString giveMePos(QString);
+    bool humanVsComputerB = false;
+    QString humanVsComputer(QString, QString);
 private:
     int moveCounter;
     int halfMoveCounter=0;
